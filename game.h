@@ -5,15 +5,15 @@
 #include <iostream>
 
 class Game {
-    public:
-        Game();
-        void run();
+public:
+    Game();
+    void run();
 
-    private:
-        void render();
-        void processEvents();
+private:
+    void render();
+    void processEvents();
 
-        sf::RenderWindow mWindow; // ventana del juego
+    sf::RenderWindow mWindow; // ventana del juego
 };
 
 Game::Game() : mWindow(sf::VideoMode(1200, 600), "Titulo del juego") {}
@@ -34,9 +34,9 @@ void Game::processEvents()      // eventos (Teclado, joystick, mouse, etc.)
     {
         switch (event.type)
         {
-            case sf::Event::Closed:
-                mWindow.close();
-                break;
+        case sf::Event::Closed:
+            mWindow.close();
+            break;
         }
     }
 }

@@ -13,7 +13,7 @@ class Pieza
 {
 	public:
 		sf::Sprite m_pieza;
-		
+
 };
 
 void Window()
@@ -83,22 +83,19 @@ void Window()
 			{
 				tablero.close();
 			}
-			sf::Vector2f pos = spriteB.getPosition();
 			if (event.type == sf::Event::MouseButtonPressed)
 			{
 				if (event.mouseButton.button == sf::Mouse::Left)
 				{
-					sf::Vector2i vecI = sf::Vector2i(spriteB.getPosition()), vecsum(1, 1);
-					sf::Vector2f vecF = sf::Vector2f(sf::Mouse::getPosition(tablero));
-					if (sf::Mouse::getPosition(tablero) == vecI)
+					sf::Vector2f vecI = sf::Vector2f(sf::Mouse::getPosition());
+
+					if (spriteB.getGlobalBounds().contains(vecI))
 					{
-						spriteB.setPosition(vecF);
+						std::cout << "Entrada";
 					}
+					std::cout << "pos x: " << sf::Mouse::getPosition().x;
+					std::cout << "\tpos y: " << sf::Mouse::getPosition().y << "\n";
 				}
-			}
-			else if (event.type == sf::Event::MouseButtonReleased)
-			{
-				spriteB.setPosition(pos);
 			}
 		}
 		tablero.clear(sf::Color(70, 70, 70));
@@ -116,7 +113,7 @@ void Window()
 					tablero.draw(spriteB);
 					spriteB.setPosition(sf::Vector2f(distancia * i, distancia * j));
 					casilla[i][j].m_casilla = spriteB;
-					
+
 				}
 				else if ((j % 2 == 1 && i % 2 == 0) || (j % 2 == 0 && i % 2 == 1))
 				{
@@ -127,6 +124,13 @@ void Window()
 			}
 		}
 
+		Pieza reyB, reyN;
+		Pieza damaB, damaN;
+		Pieza alfilB[2], alfilN[2];
+		Pieza caballoB[2], caballoN[2];
+		Pieza torreB[2], torreN[2];
+		Pieza peonB[8], peonN[8];
+
 		for (int i = 0; i < 8; i++)
 		{
 			float distancia = 64;
@@ -136,21 +140,23 @@ void Window()
 				{
 					tablero.draw(spritePeonN);
 					casilla[i][j].m_ocp = true;
+					peonN[i].m_pieza = spritePeonN;
 					spritePeonN.setPosition(sf::Vector2f(distancia * i, distancia * j));
 				}
 				if (j == 6)
 				{
 					tablero.draw(spritePeonB);
 					casilla[i][j].m_ocp = true;
+					peonB[i].m_pieza = spritePeonB;
 					spritePeonB.setPosition(sf::Vector2f(distancia * i, distancia * j));
 				}
 				if (j == 0 && i == 3)
 				{
-					
+
 				}
 				if (j == 7 && i == 3)
 				{
-					
+
 				}
 				if (j == 0 && i == 4)
 				{
@@ -158,38 +164,46 @@ void Window()
 				}
 				if (j == 7 && i == 4)
 				{
-					
+
 				}
 				if ((i == 2 && j == 0) || (i == 5 && j == 0))
 				{
+					int k = 0;
 					tablero.draw(spriteAlfilN);
 					casilla[i][j].m_ocp = true;
+					alfilN[k].m_pieza = spriteAlfilN;	k++;
 					spriteAlfilN.setPosition(sf::Vector2f(distancia * i, distancia * j));
 				}
 				if ((i == 2 && j == 7) || (i == 5 && j == 7))
 				{
+					int k = 0;
 					tablero.draw(spriteAlfilB);
 					casilla[i][j].m_ocp = true;
+					alfilB[k].m_pieza = spriteAlfilB;	k++;
 					spriteAlfilB.setPosition(sf::Vector2f(distancia * i, distancia * j));
 				}
 				if ((i == 1 && j == 0) || (i == 6 && j == 0))
 				{
-
+					int k = 0;
 				}
 				if ((i == 1 && j == 7) || (i == 6 && j == 7))
 				{
-
+					int k = 0;
 				}
 				if ((i == 0 && j == 0) || (i == 7 && j == 0))
 				{
+					int k = 0;
 					tablero.draw(spriteTorreN);
 					casilla[i][j].m_ocp = true;
+					torreN[k].m_pieza = spriteTorreN;	k++;
 					spriteTorreN.setPosition(sf::Vector2f(distancia * i, distancia * j));
 				}
 				if ((i == 0 && j == 7) || (i == 7 && j == 7))
 				{
+					int k = 0;
 					tablero.draw(spriteTorreB);
 					casilla[i][j].m_ocp = true;
+					torreB[k].m_pieza = spriteTorreB;	k++;
 					spriteTorreB.setPosition(sf::Vector2f(distancia * i, distancia * j));
 				}
 			}
