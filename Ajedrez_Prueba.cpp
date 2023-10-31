@@ -59,6 +59,18 @@ void Window()
 	spriteTorreB.setOrigin(-40, -20);
 	spriteTorreN.setOrigin(-40, -20);
 
+	caballoB.loadFromFile("CaballoB.PNG");
+	caballoN.loadFromFile("CaballoN.PNG");
+
+	sf::Sprite spriteCaballoB(caballoB);
+	sf::Sprite spriteCaballoN(caballoN);
+
+	spriteCaballoB.setScale(2, 2);
+	spriteCaballoN.setScale(2, 2);
+
+	spriteCaballoB.setOrigin(-40, -20);
+	spriteCaballoN.setOrigin(-40, -20);
+
 	alfilB.loadFromFile("AlfilB.PNG");
 	alfilN.loadFromFile("AlfilN.PNG");
 
@@ -71,7 +83,33 @@ void Window()
 	spriteAlfilB.setOrigin(-40, -20);
 	spriteAlfilN.setOrigin(-40, -20);
 
-	tablero.setPosition(sf::Vector2i(250, 100));
+	damaB.loadFromFile("DamaB.PNG");
+	damaN.loadFromFile("DamaN.PNG");
+
+	sf::Sprite spriteDamaB(damaB);
+	sf::Sprite spriteDamaN(damaN);
+
+	spriteDamaB.setScale(2, 2);
+	spriteDamaN.setScale(2, 2);
+
+	spriteDamaB.setOrigin(-40, -20);
+	spriteDamaN.setOrigin(-40, -20);
+
+	reyB.loadFromFile("ReyB.PNG");
+	reyN.loadFromFile("ReyN.PNG");
+
+	sf::Sprite spriteReyB(reyB);
+	sf::Sprite spriteReyN(reyN);
+
+	spriteReyB.setScale(2, 2);
+	spriteReyN.setScale(2, 2);
+
+	spriteReyB.setOrigin(-40, -20);
+	spriteReyN.setOrigin(-40, -20);
+
+	Casilla casilla[8][8];
+
+	tablero.setPosition(sf::Vector2i(800, 200));
 
 	while (tablero.isOpen())
 	{
@@ -87,33 +125,31 @@ void Window()
 			{
 				if (event.mouseButton.button == sf::Mouse::Left)
 				{
-					sf::Vector2f vecI = sf::Vector2f(sf::Mouse::getPosition());
-
-					if (spriteB.getGlobalBounds().contains(vecI))
+					if (casilla[5][5].m_casilla.getGlobalBounds().contains(sf::Mouse::getPosition(tablero).x, sf::Mouse::getPosition(tablero).y))
 					{
-						std::cout << "Entrada";
+						std::cout << "\tEntrada\n";
 					}
-					std::cout << "pos x: " << sf::Mouse::getPosition().x;
-					std::cout << "\tpos y: " << sf::Mouse::getPosition().y << "\n";
+					std::cout << "MOUSE - ";
+					std::cout << "(" << sf::Mouse::getPosition(tablero).x;
+					std::cout << ", " << sf::Mouse::getPosition(tablero).y << ")\n";
+					std::cout << "SPRITE - ";
+					std::cout << "(" << casilla[5][5].m_casilla.getGlobalBounds().getPosition().x;
+					std::cout << ", " << casilla[5][5].m_casilla.getGlobalBounds().getPosition().y << ")\n";
 				}
 			}
 		}
 		tablero.clear(sf::Color(70, 70, 70));
-
-		Casilla casilla[8][8];
 
 		for (int i = 0; i < 8; i++)
 		{
 			float distancia = 64;
 			for (int j = 0; j < 8; j++)
 			{
-				int I = i;
 				if ((j % 2 == 0 && i % 2 == 0) || (j % 2 == 1 && i % 2 == 1))
 				{
 					tablero.draw(spriteB);
 					spriteB.setPosition(sf::Vector2f(distancia * i, distancia * j));
 					casilla[i][j].m_casilla = spriteB;
-
 				}
 				else if ((j % 2 == 1 && i % 2 == 0) || (j % 2 == 0 && i % 2 == 1))
 				{
@@ -152,19 +188,31 @@ void Window()
 				}
 				if (j == 0 && i == 3)
 				{
-
+					tablero.draw(spriteDamaN);
+					casilla[i][j].m_ocp = true;
+					damaN.m_pieza = spriteDamaN;
+					spriteDamaN.setPosition(sf::Vector2f(distancia * i, distancia * j));
 				}
 				if (j == 7 && i == 3)
 				{
-
+					tablero.draw(spriteDamaB);
+					casilla[i][j].m_ocp = true;
+					damaB.m_pieza = spriteDamaB;
+					spriteDamaB.setPosition(sf::Vector2f(distancia * i, distancia * j));
 				}
 				if (j == 0 && i == 4)
 				{
-
+					tablero.draw(spriteReyN);
+					casilla[i][j].m_ocp = true;
+					reyN.m_pieza = spriteReyN;
+					spriteReyN.setPosition(sf::Vector2f(distancia * i, distancia * j));
 				}
 				if (j == 7 && i == 4)
 				{
-
+					tablero.draw(spriteReyB);
+					casilla[i][j].m_ocp = true;
+					reyB.m_pieza = spriteReyB;
+					spriteReyB.setPosition(sf::Vector2f(distancia * i, distancia * j));
 				}
 				if ((i == 2 && j == 0) || (i == 5 && j == 0))
 				{
@@ -185,10 +233,18 @@ void Window()
 				if ((i == 1 && j == 0) || (i == 6 && j == 0))
 				{
 					int k = 0;
+					tablero.draw(spriteCaballoN);
+					casilla[i][j].m_ocp = true;
+					caballoN[k].m_pieza = spriteCaballoN;	k++;
+					spriteCaballoN.setPosition(sf::Vector2f(distancia* i, distancia* j));
 				}
 				if ((i == 1 && j == 7) || (i == 6 && j == 7))
 				{
 					int k = 0;
+					tablero.draw(spriteCaballoB);
+					casilla[i][j].m_ocp = true;
+					caballoB[k].m_pieza = spriteCaballoB;	k++;
+					spriteCaballoB.setPosition(sf::Vector2f(distancia* i, distancia* j));
 				}
 				if ((i == 0 && j == 0) || (i == 7 && j == 0))
 				{

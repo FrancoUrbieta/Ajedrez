@@ -49,3 +49,8 @@ void Game::render()     // se encarga de dibujar las cosas
 
     mWindow.display();
 }
+
+/*if (sf::Mouse::getPosition(tablero).x < casilla[5][5].m_casilla.getGlobalBounds().getPosition().x &&
+    sf::Mouse::getPosition(tablero).y < casilla[5][5].m_casilla.getGlobalBounds().getPosition().y) &&
+    (sf::Mouse::getPosition(tablero).x > casilla[5][5].m_casilla.getGlobalBounds().getPosition().x - 64 &&
+        sf::Mouse::getPosition(tablero).y > casilla[5][5].m_casilla.getGlobalBounds().getPosition().y - 64)) { }*/
