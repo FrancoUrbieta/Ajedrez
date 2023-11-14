@@ -3,22 +3,82 @@
 #include <iostream>
 #include "game.h"
 
-struct Casilla
-{
-	sf::Sprite m_casilla;
-	bool m_ocp = false;
-};
+enum Tipo { Rey = 1, Dama, Torre, Alfil, Caballo, Peon }; 
+enum Color { B = 1, N };
 
 class Pieza
 {
-	public:
-		sf::Sprite m_pieza;
+public:
+	sf::Sprite m_sprite;
+	int m_nro;
+	Tipo m_tipo;
+	Color m_color;
+	int m_posX;
+	char m_posY;
 
+	void setSprite(sf::Texture& t)
+	{
+		m_sprite.setTexture(t);
+		m_sprite.setScale(2, 2);
+		m_sprite.setOrigin(-40, -20);
+	}
+
+	std::string getTipo()
+	{
+		switch (m_tipo)
+		{
+		case::Rey:
+			return "Rey";
+		case::Dama:
+			return "Dama";
+		case::Torre:
+			return "Torre";
+		case::Alfil:
+			return "Alfil";
+		case::Caballo:
+			return "Caballo";
+		case::Peon:
+			return "Peon";
+		default:
+			break;
+		}
+	}
+	std::string getColor()
+	{
+		switch (m_color)
+		{
+		case Color::B:
+			return "Blanco";
+		case Color::N:
+			return "Negro";
+		default:
+			break;
+		}
+	}
+};
+
+class Casilla
+{
+public:
+	sf::Sprite m_casilla;
+	bool m_ocp = false;
+	Pieza m_pieza;
+
+	void setSprite(sf::Texture& t)
+	{
+		m_casilla.setTexture(t);
+		m_casilla.setScale(2, 2);
+		m_casilla.setOrigin(-40, -20);
+	}
+
+	void setPieza(Pieza p) {
+		m_pieza = p;
+	}
 };
 
 void Window()
 {
-	sf::RenderWindow tablero(sf::VideoMode(1000, 700), "Tablero");
+	sf::RenderWindow ajedrez(sf::VideoMode(1000, 700), "Ajedrez");
 	sf::Texture casillaB, casillaN;
 	sf::Texture peonB, peonN, reyB, reyN, damaB, damaN;
 	sf::Texture torreB, torreN, caballoB, caballoN, alfilB, alfilN;
@@ -26,101 +86,222 @@ void Window()
 	casillaB.loadFromFile("CasillaB.PNG");
 	casillaN.loadFromFile("CasillaN.PNG");
 
-	sf::Sprite spriteB(casillaB);
-	sf::Sprite spriteN(casillaN);
-
-	spriteB.setScale(2, 2);
-	spriteN.setScale(2, 2);
-
-	spriteB.setOrigin(-40, -20);
-	spriteN.setOrigin(-40, -20);
-
 	peonB.loadFromFile("PeonB.PNG");
 	peonN.loadFromFile("PeonN.PNG");
-
-	sf::Sprite spritePeonB(peonB);
-	sf::Sprite spritePeonN(peonN);
-
-	spritePeonB.setScale(2, 2);
-	spritePeonN.setScale(2, 2);
-
-	spritePeonB.setOrigin(-40, -20);
-	spritePeonN.setOrigin(-40, -20);
 
 	torreB.loadFromFile("TorreB.PNG");
 	torreN.loadFromFile("TorreN.PNG");
 
-	sf::Sprite spriteTorreB(torreB);
-	sf::Sprite spriteTorreN(torreN);
-
-	spriteTorreB.setScale(2, 2);
-	spriteTorreN.setScale(2, 2);
-
-	spriteTorreB.setOrigin(-40, -20);
-	spriteTorreN.setOrigin(-40, -20);
-
 	caballoB.loadFromFile("CaballoB.PNG");
 	caballoN.loadFromFile("CaballoN.PNG");
-
-	sf::Sprite spriteCaballoB(caballoB);
-	sf::Sprite spriteCaballoN(caballoN);
-
-	spriteCaballoB.setScale(2, 2);
-	spriteCaballoN.setScale(2, 2);
-
-	spriteCaballoB.setOrigin(-40, -20);
-	spriteCaballoN.setOrigin(-40, -20);
 
 	alfilB.loadFromFile("AlfilB.PNG");
 	alfilN.loadFromFile("AlfilN.PNG");
 
-	sf::Sprite spriteAlfilB(alfilB);
-	sf::Sprite spriteAlfilN(alfilN);
-
-	spriteAlfilB.setScale(2, 2);
-	spriteAlfilN.setScale(2, 2);
-
-	spriteAlfilB.setOrigin(-40, -20);
-	spriteAlfilN.setOrigin(-40, -20);
-
 	damaB.loadFromFile("DamaB.PNG");
 	damaN.loadFromFile("DamaN.PNG");
-
-	sf::Sprite spriteDamaB(damaB);
-	sf::Sprite spriteDamaN(damaN);
-
-	spriteDamaB.setScale(2, 2);
-	spriteDamaN.setScale(2, 2);
-
-	spriteDamaB.setOrigin(-40, -20);
-	spriteDamaN.setOrigin(-40, -20);
 
 	reyB.loadFromFile("ReyB.PNG");
 	reyN.loadFromFile("ReyN.PNG");
 
-	sf::Sprite spriteReyB(reyB);
-	sf::Sprite spriteReyN(reyN);
+	Casilla tablero[8][8];
+	Pieza p[32], P;
 
-	spriteReyB.setScale(2, 2);
-	spriteReyN.setScale(2, 2);
+	float distancia = 64;
 
-	spriteReyB.setOrigin(-40, -20);
-	spriteReyN.setOrigin(-40, -20);
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if ((j % 2 == 0 && i % 2 == 0) || (j % 2 == 1 && i % 2 == 1))
+			{
+				tablero[i][j].setSprite(casillaB);
+				tablero[i][j].m_casilla.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(tablero[i][j].m_casilla);
+			}
+			else if ((j % 2 == 1 && i % 2 == 0) || (j % 2 == 0 && i % 2 == 1))
+			{
+				tablero[i][j].setSprite(casillaN);
+				tablero[i][j].m_casilla.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(tablero[i][j].m_casilla);
+			}
+		}
+	}
 
-	Casilla casilla[8][8];
+	int k = 0;
 
-	tablero.setPosition(sf::Vector2i(800, 200));
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if (j == 1)
+			{
+				tablero[i][j].m_ocp = true;
+				p[k].setSprite(peonN);
+				p[k].m_nro = k;
+				p[k].m_tipo = Peon;
+				p[k].m_color = N;
+				p[k].m_posX = i + 1;
+				p[k].m_posY = char(j + 97);
+				tablero[i][j].setPieza(p[k]);
+				p[k].m_sprite.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(p[k].m_sprite);	k++;
+			}
+			if (j == 6)
+			{
+				tablero[i][j].m_ocp = true;
+				p[k].setSprite(peonB);
+				p[k].m_nro = k;
+				p[k].m_tipo = Peon;
+				p[k].m_color = B;
+				p[k].m_posX = i + 1;
+				p[k].m_posY = char(j + 97);
+				tablero[i][j].setPieza(p[k]);
+				p[k].m_sprite.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(p[k].m_sprite);	k++;
+			}
+			if (j == 0 && i == 3)
+			{
+				tablero[i][j].m_ocp = true;
+				p[k].setSprite(damaN);
+				p[k].m_nro = k;
+				p[k].m_tipo = Dama;
+				p[k].m_color = N;
+				p[k].m_posX = i + 1;
+				p[k].m_posY = char(j + 97);
+				tablero[i][j].setPieza(p[k]);
+				p[k].m_sprite.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(p[k].m_sprite);	k++;
+			}
+			if (j == 7 && i == 3)
+			{
+				tablero[i][j].m_ocp = true;
+				p[k].setSprite(damaB);
+				p[k].m_nro = k;
+				p[k].m_tipo = Dama;
+				p[k].m_color = B;
+				p[k].m_posX = i + 1;
+				p[k].m_posY = char(j + 97);
+				tablero[i][j].setPieza(p[k]);
+				p[k].m_sprite.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(p[k].m_sprite);	k++;
+			}
+			if (j == 0 && i == 4)
+			{
+				tablero[i][j].m_ocp = true;
+				p[k].setSprite(reyN);
+				p[k].m_nro = k;
+				p[k].m_tipo = Rey;
+				p[k].m_color = N;
+				p[k].m_posX = i + 1;
+				p[k].m_posY = char(j + 97);
+				tablero[i][j].setPieza(p[k]);
+				p[k].m_sprite.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(p[k].m_sprite);	k++;
+			}
+			if (j == 7 && i == 4)
+			{
+				tablero[i][j].m_ocp = true;
+				p[k].setSprite(reyB);
+				p[k].m_nro = k;
+				p[k].m_tipo = Rey;
+				p[k].m_color = B;
+				p[k].m_posX = i + 1;
+				p[k].m_posY = char(j + 97);
+				tablero[i][j].setPieza(p[k]);
+				p[k].m_sprite.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(p[k].m_sprite);	k++;
+			}
+			if ((i == 2 && j == 0) || (i == 5 && j == 0))
+			{
+				tablero[i][j].m_ocp = true;
+				p[k].setSprite(alfilN);
+				p[k].m_nro = k;
+				p[k].m_tipo = Alfil;
+				p[k].m_color = N;
+				p[k].m_posX = i + 1;
+				p[k].m_posY = char(j + 97);
+				tablero[i][j].setPieza(p[k]);
+				p[k].m_sprite.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(p[k].m_sprite);	k++;
+			}
+			if ((i == 2 && j == 7) || (i == 5 && j == 7))
+			{
+				tablero[i][j].m_ocp = true;
+				p[k].setSprite(alfilB);
+				p[k].m_nro = k;
+				p[k].m_tipo = Alfil;
+				p[k].m_color = B;
+				p[k].m_posX = i + 1;
+				p[k].m_posY = char(j + 97);
+				tablero[i][j].setPieza(p[k]);
+				p[k].m_sprite.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(p[k].m_sprite);	k++;
+			}
+			if ((i == 1 && j == 0) || (i == 6 && j == 0))
+			{
+				tablero[i][j].m_ocp = true;
+				p[k].setSprite(caballoN);
+				p[k].m_nro = k;
+				p[k].m_tipo = Caballo;
+				p[k].m_color = N;
+				p[k].m_posX = i + 1;
+				p[k].m_posY = char(j + 97);
+				tablero[i][j].setPieza(p[k]);
+				p[k].m_sprite.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(p[k].m_sprite);	k++;
+			}
+			if ((i == 1 && j == 7) || (i == 6 && j == 7))
+			{
+				tablero[i][j].m_ocp = true;
+				p[k].setSprite(caballoB);
+				p[k].m_nro = k;
+				p[k].m_tipo = Caballo;
+				p[k].m_color = B;
+				p[k].m_posX = i + 1;
+				p[k].m_posY = char(j + 97);
+				tablero[i][j].setPieza(p[k]);
+				p[k].m_sprite.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(p[k].m_sprite);	k++;
+			}
+			if ((i == 0 && j == 0) || (i == 7 && j == 0))
+			{
+				tablero[i][j].m_ocp = true;
+				p[k].setSprite(torreN);
+				p[k].m_nro = k;
+				p[k].m_tipo = Torre;
+				p[k].m_color = N;
+				p[k].m_posX = i + 1;
+				p[k].m_posY = char(j + 97);
+				tablero[i][j].setPieza(p[k]);
+				p[k].m_sprite.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(p[k].m_sprite);	k++;
+			}
+			if ((i == 0 && j == 7) || (i == 7 && j == 7))
+			{
+				tablero[i][j].m_ocp = true;
+				p[k].setSprite(torreB);
+				p[k].m_nro = k;
+				p[k].m_tipo = Torre;
+				p[k].m_color = B;
+				p[k].m_posX = i + 1;
+				p[k].m_posY = char(j + 97);
+				tablero[i][j].setPieza(p[k]);
+				p[k].m_sprite.setPosition(sf::Vector2f(distancia * i, distancia * j));
+				ajedrez.draw(p[k].m_sprite);	k++;
+			}
+		}
+	}
 
-	while (tablero.isOpen())
+	ajedrez.setPosition(sf::Vector2i(800, 200));
+
+	while (ajedrez.isOpen())
 	{
 		sf::Event event;
 
-		while (tablero.pollEvent(event))
+		while (ajedrez.pollEvent(event))
 		{
-			if (event.type == sf::Event::Closed)
-			{
-				tablero.close();
-			}
+			if (event.type == sf::Event::Closed) { ajedrez.close(); }
 			if (event.type == sf::Event::MouseButtonPressed)
 			{
 				if (event.mouseButton.button == sf::Mouse::Left)
@@ -129,149 +310,78 @@ void Window()
 					{
 						for (int j = 0; j < 8; j++)
 						{
-							if (casilla[i][j].m_casilla.getGlobalBounds().contains(sf::Mouse::getPosition(tablero).x, sf::Mouse::getPosition(tablero).y))
+							if (tablero[i][j].m_casilla.getGlobalBounds().contains(sf::Mouse::getPosition(ajedrez).x, sf::Mouse::getPosition(ajedrez).y))
 							{
-								std::cout << "\tEntrada\n";
-								std::cout << "MOUSE - ";
-								std::cout << "(" << sf::Mouse::getPosition(tablero).x;
-								std::cout << ", " << sf::Mouse::getPosition(tablero).y << ")\n";
-								std::cout << "CASILLA[" << i + 1 << "][" << j + 1 << "] - ";
-								std::cout << "(" << casilla[i][j].m_casilla.getGlobalBounds().getPosition().x;
-								std::cout << ", " << casilla[i][j].m_casilla.getGlobalBounds().getPosition().y << ")\n\n";
+								if (tablero[i][j].m_ocp == true)
+								{
+									std::cout << "\tEntrada en " << tablero[i][j].m_pieza.getTipo() << " " << tablero[i][j].m_pieza.getColor() << "\n";
+									std::cout << "MOUSE - ";
+									std::cout << "(" << sf::Mouse::getPosition(ajedrez).x;
+									std::cout << ", " << sf::Mouse::getPosition(ajedrez).y << ")\n";
+									std::cout << "CASILLA[" << i + 1 << "][" << j + 1 << "] - ";
+									std::cout << "(" << tablero[i][j].m_casilla.getGlobalBounds().getPosition().x;
+									std::cout << ", " << tablero[i][j].m_casilla.getGlobalBounds().getPosition().y << ")\n\n";
+
+									switch (tablero[i][j].m_pieza.m_tipo)
+									{
+									case::Peon:
+										if (tablero[i][j].m_pieza.m_color == B)
+										{
+											if (tablero[i][j - 1].m_ocp == false)
+											{
+												p[tablero[i][j].m_pieza.m_nro].m_sprite.move(0, -64);
+												tablero[i][j].m_ocp = false;
+												tablero[i][j - 1].setPieza(p[tablero[i][j].m_pieza.m_nro]);
+												tablero[i][j - 1].m_ocp = true;
+											}
+										}
+										else if (tablero[i][j].m_pieza.m_color == N)
+										{
+											if (tablero[i][j + 1].m_ocp == false)
+											{
+												p[tablero[i][j].m_pieza.m_nro].m_sprite.move(0, 64);
+												tablero[i][j].m_ocp = false;
+												tablero[i][j + 1].setPieza(p[tablero[i][j].m_pieza.m_nro]);
+												tablero[i][j + 1].m_ocp = true;
+											}
+										}
+										break;
+									case::Caballo:
+										break;
+									case::Alfil:
+										break;
+									case::Torre:
+										break;
+									case::Dama:
+										break;
+									case::Rey:
+										break;
+									default:
+										break;
+									}
+									break;
+								}
 							}
 						}
 					}
 				}
 			}
 		}
-		tablero.clear(sf::Color(70, 70, 70));
+		ajedrez.clear(sf::Color(70, 70, 70));
 
 		for (int i = 0; i < 8; i++)
 		{
-			float distancia = 64;
 			for (int j = 0; j < 8; j++)
 			{
-				if ((j % 2 == 0 && i % 2 == 0) || (j % 2 == 1 && i % 2 == 1))
-				{
-					tablero.draw(spriteB);
-					spriteB.setPosition(sf::Vector2f(distancia * i, distancia * j));
-					casilla[i][j].m_casilla = spriteB;
-				}
-				else if ((j % 2 == 1 && i % 2 == 0) || (j % 2 == 0 && i % 2 == 1))
-				{
-					tablero.draw(spriteN);
-					spriteN.setPosition(sf::Vector2f(distancia * i, distancia * j));
-					casilla[i][j].m_casilla = spriteN;
-				}
+				ajedrez.draw(tablero[i][j].m_casilla);
 			}
 		}
-
-		Pieza reyB, reyN;
-		Pieza damaB, damaN;
-		Pieza alfilB[2], alfilN[2];
-		Pieza caballoB[2], caballoN[2];
-		Pieza torreB[2], torreN[2];
-		Pieza peonB[8], peonN[8];
-
-		for (int i = 0; i < 8; i++)
+		for (int k = 0; k < 32; k++)
 		{
-			float distancia = 64;
-			for (int j = 0; j < 8; j++)
-			{
-				if (j == 1)
-				{
-					tablero.draw(spritePeonN);
-					casilla[i][j].m_ocp = true;
-					peonN[i].m_pieza = spritePeonN;
-					spritePeonN.setPosition(sf::Vector2f(distancia * i, distancia * j));
-				}
-				if (j == 6)
-				{
-					tablero.draw(spritePeonB);
-					casilla[i][j].m_ocp = true;
-					peonB[i].m_pieza = spritePeonB;
-					spritePeonB.setPosition(sf::Vector2f(distancia * i, distancia * j));
-				}
-				if (j == 0 && i == 3)
-				{
-					tablero.draw(spriteDamaN);
-					casilla[i][j].m_ocp = true;
-					damaN.m_pieza = spriteDamaN;
-					spriteDamaN.setPosition(sf::Vector2f(distancia * i, distancia * j));
-				}
-				if (j == 7 && i == 3)
-				{
-					tablero.draw(spriteDamaB);
-					casilla[i][j].m_ocp = true;
-					damaB.m_pieza = spriteDamaB;
-					spriteDamaB.setPosition(sf::Vector2f(distancia * i, distancia * j));
-				}
-				if (j == 0 && i == 4)
-				{
-					tablero.draw(spriteReyN);
-					casilla[i][j].m_ocp = true;
-					reyN.m_pieza = spriteReyN;
-					spriteReyN.setPosition(sf::Vector2f(distancia * i, distancia * j));
-				}
-				if (j == 7 && i == 4)
-				{
-					tablero.draw(spriteReyB);
-					casilla[i][j].m_ocp = true;
-					reyB.m_pieza = spriteReyB;
-					spriteReyB.setPosition(sf::Vector2f(distancia * i, distancia * j));
-				}
-				if ((i == 2 && j == 0) || (i == 5 && j == 0))
-				{
-					int k = 0;
-					tablero.draw(spriteAlfilN);
-					casilla[i][j].m_ocp = true;
-					alfilN[k].m_pieza = spriteAlfilN;	k++;
-					spriteAlfilN.setPosition(sf::Vector2f(distancia * i, distancia * j));
-				}
-				if ((i == 2 && j == 7) || (i == 5 && j == 7))
-				{
-					int k = 0;
-					tablero.draw(spriteAlfilB);
-					casilla[i][j].m_ocp = true;
-					alfilB[k].m_pieza = spriteAlfilB;	k++;
-					spriteAlfilB.setPosition(sf::Vector2f(distancia * i, distancia * j));
-				}
-				if ((i == 1 && j == 0) || (i == 6 && j == 0))
-				{
-					int k = 0;
-					tablero.draw(spriteCaballoN);
-					casilla[i][j].m_ocp = true;
-					caballoN[k].m_pieza = spriteCaballoN;	k++;
-					spriteCaballoN.setPosition(sf::Vector2f(distancia* i, distancia* j));
-				}
-				if ((i == 1 && j == 7) || (i == 6 && j == 7))
-				{
-					int k = 0;
-					tablero.draw(spriteCaballoB);
-					casilla[i][j].m_ocp = true;
-					caballoB[k].m_pieza = spriteCaballoB;	k++;
-					spriteCaballoB.setPosition(sf::Vector2f(distancia* i, distancia* j));
-				}
-				if ((i == 0 && j == 0) || (i == 7 && j == 0))
-				{
-					int k = 0;
-					tablero.draw(spriteTorreN);
-					casilla[i][j].m_ocp = true;
-					torreN[k].m_pieza = spriteTorreN;	k++;
-					spriteTorreN.setPosition(sf::Vector2f(distancia * i, distancia * j));
-				}
-				if ((i == 0 && j == 7) || (i == 7 && j == 7))
-				{
-					int k = 0;
-					tablero.draw(spriteTorreB);
-					casilla[i][j].m_ocp = true;
-					torreB[k].m_pieza = spriteTorreB;	k++;
-					spriteTorreB.setPosition(sf::Vector2f(distancia * i, distancia * j));
-				}
-			}
+			ajedrez.draw(p[k].m_sprite);
 		}
 
-		tablero.display();
+		ajedrez.display();
 	}
 }
 
