@@ -1,5 +1,6 @@
 #pragma once
 #include "pieza.h"
+#define distancia 96
 
 class Casilla
 {
@@ -11,7 +12,7 @@ public:
 	void setSprite(sf::Texture& t)
 	{
 		m_casilla.setTexture(t);
-		m_casilla.setScale(2, 2);
+		m_casilla.setScale(3, 3);
 
 	}
 };
@@ -27,35 +28,31 @@ bool MouseEnCasilla(sf::RenderWindow& ajedrez, int i, int j)
 	else { return false; }
 }
 
+bool MouseEnTablero(sf::RenderWindow& ajedrez)
+{
+	if ((sf::Mouse::getPosition(ajedrez).x > 0 && sf::Mouse::getPosition(ajedrez).x < 768) &&
+		(sf::Mouse::getPosition(ajedrez).y > 0 && sf::Mouse::getPosition(ajedrez).y < 768))
+	{
+		return true;
+	}
+	else { return false; }
+}
+
 sf::Vector2i EncontrarCasilla(int x, int y)
 {
-	sf::Vector2i v;
+	sf::Vector2i v(-1, -1);
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
 		{
 			if (tablero[i][j].m_casilla.getGlobalBounds().contains(x, y))
 			{
-				//std::cout << i << " - " << j << "\n";
 				v.x = i;	v.y = j;
-				return v;
+				break;
 			}
 		}
 	}
-}
-
-void CoordenadasMouse(sf::RenderWindow& ajedrez)
-{
-	std::cout << "MOUSE - ";
-	std::cout << "(" << sf::Mouse::getPosition(ajedrez).x;
-	std::cout << ", " << sf::Mouse::getPosition(ajedrez).y << ")\n";
-}
-
-void CoordenadasPieza(int k)
-{
-	std::cout << "PIEZA [" << k << "] - ";
-	std::cout << "(" << p[k].m_sprite.getPosition().x;
-	std::cout << ", " << p[k].m_sprite.getPosition().y << ")\n";
+	return v;
 }
 
 void CoordenadasCasilla(sf::RenderWindow& ajedrez, int i, int j)
@@ -71,27 +68,15 @@ void CargarPiezaEnCasilla(int i, int j, int k, Tipo tipo, Color color)
 	p[k].m_nro = k;
 	p[k].m_tipo = tipo;
 	p[k].m_color = color;
-	p[k].m_posX = i + 1;
-	p[k].m_posY = char(j + 97);
+	p[k].m_pos.x = i;
+	p[k].m_pos.y = j;
 	tablero[i][j].m_pieza = k;
-	p[k].m_sprite.setPosition(sf::Vector2f(64 * i, 64 * j));
+	p[k].m_sprite.setPosition(distancia * i, distancia * j);
 }
 
-void MovimientosPosibles(sf::Event event, int i, int j)
+void VaciarCasilla(int i, int j)
 {
-	sf::Color color = tablero[i][j].m_casilla.getColor();
-
-	while (sf::Event::MouseButtonPressed)
-	{
-		tablero[i][j].m_casilla.setColor(sf::Color::Green);
-
-		if (sf::Event::MouseButtonReleased)
-		{
-
-
-			break;
-		}
-	}
-
-	tablero[i][j].m_casilla.setColor(color);
+	tablero[i][j].m_ocp = false;
+	tablero[i][j].m_pieza = -1;
 }
+

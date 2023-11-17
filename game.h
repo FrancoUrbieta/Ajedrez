@@ -5,15 +5,33 @@ public:
 	Game();
 	void run();
 
+	Color m_turno{ Color::B };
 	bool m_jaque = false;
 	bool m_move = false;
 	int m_piece{ -1 };
 
-	sf::Vector2i m_oldpos{ -1,-1 };
-	sf::Vector2i m_newpos{ -1,-1 };
-	sf::Vector2f m_newcoord{ -1,-1 };
+	sf::Vector2i m_oldpos{ -1, -1 };
+	sf::Vector2i m_newpos{ -1, -1 };
 
-	sf::Vector2f m_coord{ -1,-1 };
+	sf::Vector2i m_oldcoord{ -1, -1 };
+	sf::Vector2i m_newcoord{ -1, -1 };
+
+	sf::Vector2f m_movecoord{ -1, -1 };
+
+	void CambioDeTurno()
+	{
+		switch (m_turno)
+		{
+		case Color::B:
+			m_turno = Color::N;
+			break;
+		case Color::N:
+			m_turno = Color::B;
+			break;
+		default:
+			break;
+		}
+	}
 
 private:
 	void render();
@@ -22,7 +40,7 @@ private:
 	sf::RenderWindow ajedrez;
 };
 
-Game::Game() : ajedrez(sf::VideoMode(1000, 700), "Ajedrez")
+Game::Game() : ajedrez(sf::VideoMode(825, 825), "Ajedrez")
 {
 	int k = 0;
 	for (int i = 0; i < 8; i++)
@@ -79,7 +97,7 @@ Game::Game() : ajedrez(sf::VideoMode(1000, 700), "Ajedrez")
 			}
 		}
 	}
-	ajedrez.setPosition(sf::Vector2i(800, 200));
+	ajedrez.setPosition(sf::Vector2i(800, 100));
 }
 
 void Game::run() {
@@ -112,94 +130,140 @@ void Game::processEvents()
 					{
 						if (MouseEnCasilla(ajedrez, i, j) && tablero[i][j].m_ocp)
 						{
-							PiezaEnCasilla(p[tablero[i][j].m_pieza]);
-							CoordenadasMouse(ajedrez);
-							CoordenadasPieza(tablero[i][j].m_pieza);
-							CoordenadasCasilla(ajedrez, i, j);
-
-							switch (p[tablero[i][j].m_pieza].m_tipo)
+							if (p[tablero[i][j].m_pieza].m_color == m_turno)
 							{
-							case::Tipo::Rey:
-								m_move = true;
-								//tablero[i][j].m_ocp = false;
-								//MovimientosPosibles(event, i, j);
-								break;
-							case::Tipo::Dama:
-								m_move = true;
+								PiezaEnCasilla(p[tablero[i][j].m_pieza]);
+								CoordenadasMouse(ajedrez);
+								CoordenadasPieza(tablero[i][j].m_pieza);
+								CoordenadasCasilla(ajedrez, i, j);
 
-								break;
-							case::Tipo::Torre:
+								m_piece = tablero[i][j].m_pieza;
+								m_oldpos.x = i;		m_oldpos.y = j;
+								m_oldcoord.x = tablero[m_oldpos.x][m_oldpos.y].m_casilla.getGlobalBounds().getPosition().x;
+								m_oldcoord.y = tablero[m_oldpos.x][m_oldpos.y].m_casilla.getGlobalBounds().getPosition().y;
+								m_movecoord.x = mouse.x - p[m_piece].m_sprite.getPosition().x;
+								m_movecoord.y = mouse.y - p[m_piece].m_sprite.getPosition().y;
 								m_move = true;
-								break;
-							case::Tipo::Alfil:
-								m_move = true;
-								break;
-							case::Tipo::Caballo:
-								m_move = true;
-								break;
-							case::Tipo::Peon:
-								m_move = true;
-								//MovimientosPeon(i, j);
-								break;
-							default:
 								break;
 							}
-
-							m_piece = tablero[i][j].m_pieza;
-							m_oldpos.x = i;		m_oldpos.y = j;
-							m_coord.x = mouse.x - p[m_piece].m_sprite.getPosition().x;
-							m_coord.y = mouse.y - p[m_piece].m_sprite.getPosition().y;
-							break;
-
+							else { m_move = false; }
 						}
 						else if (MouseEnCasilla(ajedrez, i, j) && !tablero[i][j].m_ocp)
 						{
 							std::cout << "\tSin entrada\n";
 							m_oldpos.x = i;		m_oldpos.y = j;
+							m_oldcoord.x = tablero[m_oldpos.x][m_oldpos.y].m_casilla.getGlobalBounds().getPosition().x;
+							m_oldcoord.y = tablero[m_oldpos.x][m_oldpos.y].m_casilla.getGlobalBounds().getPosition().y;
 							CoordenadasMouse(ajedrez);
 							CoordenadasCasilla(ajedrez, i, j);
+							m_move = false;
+							break;
 						}
+
 					}
 				}
 			}
 			break;
 		case sf::Event::MouseButtonReleased:
-			if (event.mouseButton.button == sf::Mouse::Left)
+			if (m_move)
+			{
+				m_newpos = EncontrarCasilla(mouse.x, mouse.y);
+
+				switch (p[m_piece].m_tipo)
+				{
+				case::Tipo::Rey:
+					m_move = true;
+					break;
+				case::Tipo::Dama:
+					m_move = true;
+					break;
+				case::Tipo::Torre:
+					m_move = MovimientosTorre(m_piece, m_newpos, m_oldpos);
+					//m_move = true;
+					break;
+				case::Tipo::Alfil:
+					m_move = MovimientosAlfil(m_piece, m_newpos, m_oldpos);
+					//m_move = true;
+					break;
+				case::Tipo::Caballo:
+					m_move = true;
+					break;
+				case::Tipo::Peon:
+					m_move = MovimientosPeon(m_piece, m_newpos, m_oldpos);
+					//m_move = true;
+					break;
+				default:
+					break;
+				}
+			}
+
+			if (m_move)
 			{
 				if (!MouseEnCasilla(ajedrez, m_oldpos.x, m_oldpos.y))
 				{
-					if (tablero[m_oldpos.x][m_oldpos.y].m_ocp)
+					if (MouseEnTablero(ajedrez))
 					{
-						std::cout << "Movimiento\n\n";
+						if (PiezaRival(tablero[m_newpos.x][m_newpos.y].m_pieza, tablero[m_oldpos.x][m_oldpos.y].m_pieza))
+						{
+							std::cout << "Movimiento\n\n";
 
+							std::cout << "\tNUEVA UBICACION\n";
+							CoordenadasPieza(m_piece);
+							CoordenadasCasilla(ajedrez, m_newpos.x, m_newpos.y);
+
+							m_newcoord.x = tablero[m_newpos.x][m_newpos.y].m_casilla.getGlobalBounds().getPosition().x;
+							m_newcoord.y = tablero[m_newpos.x][m_newpos.y].m_casilla.getGlobalBounds().getPosition().y;
+
+							if (!tablero[m_newpos.x][m_newpos.y].m_ocp)
+							{
+								CargarPiezaEnCasilla(m_newpos.x, m_newpos.y, m_piece, p[m_piece].m_tipo, p[m_piece].m_color);
+								VaciarCasilla(m_oldpos.x, m_oldpos.y);
+							}
+							else if (tablero[m_newpos.x][m_newpos.y].m_ocp)
+							{
+								std::cout << "\tPIEZA CAPTURADA\n";
+								p[tablero[m_newpos.x][m_newpos.y].m_pieza].m_sprite.setPosition(1000, 1000);
+								if (p[tablero[m_newpos.x][m_newpos.y].m_pieza].m_tipo == Tipo::Rey)
+								{
+									ajedrez.close();
+								}
+								VaciarCasilla(m_newpos.x, m_newpos.y);
+								CargarPiezaEnCasilla(m_newpos.x, m_newpos.y, m_piece, p[m_piece].m_tipo, p[m_piece].m_color);
+								VaciarCasilla(m_oldpos.x, m_oldpos.y);
+							}
+						}
+						else if (!PiezaRival(tablero[m_newpos.x][m_newpos.y].m_pieza, tablero[m_oldpos.x][m_oldpos.y].m_pieza))
+						{
+							p[m_piece].m_sprite.setPosition(m_oldcoord.x, m_oldcoord.y);
+							CambioDeTurno();
+						}
 					}
-					m_move = false;
-
+					else if (!MouseEnTablero(ajedrez))
+					{
+						p[m_piece].m_sprite.setPosition(m_oldcoord.x, m_oldcoord.y);
+						CambioDeTurno();
+					}
 				}
+				else if (MouseEnCasilla(ajedrez, m_oldpos.x, m_oldpos.y))
+				{
+					p[m_piece].m_sprite.setPosition(m_oldcoord.x, m_oldcoord.y);
+					CambioDeTurno();
+				}
+				CambioDeTurno();
 			}
-			m_newpos = EncontrarCasilla(mouse.x, mouse.y);
-			std::cout << "Nueva ubicacion - ";
-			std::cout << "(" << p[m_piece].m_sprite.getPosition().x;
-			std::cout << ", " << p[m_piece].m_sprite.getPosition().y << ")\n";
-			std::cout << "CASILLA[" << m_newpos.x + 1 << "][" << m_newpos.y + 1 << "] - ";
-			std::cout << "(" << tablero[m_newpos.x][m_newpos.y].m_casilla.getGlobalBounds().getPosition().x;
-			std::cout << ", " << tablero[m_newpos.x][m_newpos.y].m_casilla.getGlobalBounds().getPosition().y << ")\n\n";
-
-			m_newcoord.x = tablero[m_newpos.x][m_newpos.y].m_casilla.getGlobalBounds().getPosition().x;
-			m_newcoord.y = tablero[m_newpos.x][m_newpos.y].m_casilla.getGlobalBounds().getPosition().y;
-
-			p[m_piece].m_sprite.setPosition(m_newcoord.x, m_newcoord.y);
+			else if (!m_move)
+			{
+				p[m_piece].m_sprite.setPosition(m_oldcoord.x, m_oldcoord.y);
+				std::cout << "\n\tMovimiento Incorrecto - Vuelva a intentar...\n";
+			}
+			m_piece = -1;
 			break;
 		}
-		if (m_move)
-		{
-			p[m_piece].m_sprite.setPosition(mouse.x - m_coord.x, mouse.y - m_coord.y);
-
-		}
+		if (m_move) { p[m_piece].m_sprite.setPosition(mouse.x - m_movecoord.x, mouse.y - m_movecoord.y); }
 	}
 }
 
-void Game::render()     // se encarga de dibujar las cosas
+void Game::render()
 {
 	ajedrez.clear(sf::Color(70, 70, 70));
 
@@ -210,7 +274,6 @@ void Game::render()     // se encarga de dibujar las cosas
 
 	for (int i = 0; i < 8; i++)
 	{
-		float distancia = 64;
 		for (int j = 0; j < 8; j++)
 		{
 			if ((j % 2 == 0 && i % 2 == 0) || (j % 2 == 1 && i % 2 == 1))
@@ -294,3 +357,4 @@ void Game::render()     // se encarga de dibujar las cosas
 
 	ajedrez.display();
 }
+

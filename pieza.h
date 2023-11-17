@@ -11,14 +11,13 @@ public:
 	int m_nro{ -1 };
 	Tipo m_tipo{};
 	Color m_color{};
-	int m_posX{ 0 };
-	char m_posY{ 'x' };
+	sf::Vector2i m_pos{ -1, -1 };
 	bool m_move = false;
 
 	void setSprite(sf::Texture& t)
 	{
 		m_sprite.setTexture(t);
-		m_sprite.setScale(2, 2);
+		m_sprite.setScale(3, 3);
 
 	}
 
@@ -71,4 +70,30 @@ void CargarTextura(sf::Texture& t, std::string path)
 void PiezaEnCasilla(Pieza p)
 {
 	std::cout << "\tEntrada en " << p.getTipo() << " " << p.getColor() << "\n";
+}
+
+void CoordenadasMouse(sf::RenderWindow& ajedrez)
+{
+	std::cout << "MOUSE - ";
+	std::cout << "(" << sf::Mouse::getPosition(ajedrez).x;
+	std::cout << ", " << sf::Mouse::getPosition(ajedrez).y << ")\n";
+}
+
+void CoordenadasPieza(int k)
+{
+	std::cout << "PIEZA [" << k + 1 << "] - ";
+	std::cout << "(" << p[k].m_sprite.getPosition().x;
+	std::cout << ", " << p[k].m_sprite.getPosition().y << ")\n";
+}
+
+bool PiezaRival(int k, int l)
+{
+	if (p[k].m_color == p[l].m_color)
+	{
+		return false;
+	}
+	else if (p[k].m_color != p[l].m_color)
+	{
+		return true;
+	}
 }

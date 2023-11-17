@@ -4,54 +4,116 @@ void MovimientosRey() {}
 
 void MovimientosDama() {}
 
-void MovimientosTorre() {}
+bool MovimientosTorre(int k, sf::Vector2i posA, sf::Vector2i posB)
+{
+	int pos = 0;
 
-void MovimientosAlfil() {}
+	if (p[k].m_color == Color::B) { pos = posB.x - posA.x; }
+	else if (p[k].m_color == Color::N) { pos = -posB.x + posA.x; }
+
+	if (posB.x == posA.x + pos && posB.y == posA.y)
+	{
+		return true;
+	}
+	else if (posB.x == posA.x - pos && posB.y == posA.y)
+	{
+		return true;
+	}
+	else if (posB.x == posA.x && posB.y == posA.y + pos)
+	{
+		return true;
+	}
+	else if (posB.x == posA.x && posB.y == posA.y - pos)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool MovimientosAlfil(int k, sf::Vector2i posA, sf::Vector2i posB)
+{
+	int pos = 0;
+
+	if (p[k].m_color == Color::B) { pos = posB.x - posA.x; }
+	else if (p[k].m_color == Color::N) { pos = -posB.x + posA.x; }
+
+	if (posB.x == posA.x + pos && posB.y == posA.y + pos)
+	{
+		return true;
+	}
+	else if (posB.x == posA.x + pos && posB.y == posA.y - pos)
+	{
+		return true;
+	}
+	else if (posB.x == posA.x - pos && posB.y == posA.y - pos)
+	{
+		return true;
+	}
+	else if (posB.x == posA.x - pos && posB.y == posA.y + pos)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 
 void MovimientosCaballo() {}
 
-void MovimientosPeon(int i, int j)
+bool MovimientosPeon(int k, sf::Vector2i posA, sf::Vector2i posB)
 {
-	if (p[tablero[i][j].m_pieza].m_color == Color::B)
+	int pos = 0;
+
+	if (p[k].m_color == Color::B) { pos = 1; }
+	else if (p[k].m_color == Color::N) { pos = -1; }
+
+	if (!tablero[posA.x][posA.y].m_ocp)
 	{
-		if ((!tablero[i][j - 1].m_ocp && !tablero[i][j - 2].m_ocp) && (!p[tablero[i][j].m_pieza].m_move))
+		if (!p[k].m_move)
 		{
-			p[tablero[i][j].m_pieza].m_sprite.move(0, -128);
-			p[tablero[i][j].m_pieza].m_move = true;
-			tablero[i][j].m_ocp = false;
-			tablero[i][j - 2].m_pieza = p[tablero[i][j].m_pieza].m_nro;
-			tablero[i][j - 2].m_ocp = true;
+			if (posB.x == posA.x && posB.y == posA.y + pos * 2)
+			{
+				p[k].m_move = true;
+				return true;
+			}
+			else if (posB.x == posA.x && posB.y == posA.y + pos)
+			{
+				p[k].m_move = true;
+				return true;
+			}
+			else { return false; }
 		}
-		else if ((!tablero[i][j - 1].m_ocp) && j > 0)
+		else if (p[k].m_move)
 		{
-			p[tablero[i][j].m_pieza].m_sprite.move(0, -64);
-			tablero[i][j].m_ocp = false;
-			tablero[i][j - 1].m_pieza = p[tablero[i][j].m_pieza].m_nro;
-			tablero[i][j - 1].m_ocp = true;
-		}
-		else if (tablero[i - 1][j - 1].m_ocp && j > 0 && i > 0)
-		{
-			p[tablero[i][j].m_pieza].m_sprite.move(-64, -64);
-			tablero[i][j].m_ocp = false;
-			tablero[i - 1][j - 1].m_pieza = p[tablero[i][j].m_pieza].m_nro;
-			tablero[i - 1][j - 1].m_ocp = true;
+			if (posB.x == posA.x && posB.y == posA.y + pos)
+			{
+				p[k].m_move = true;
+				return true;
+			}
+			else { return false; }
 		}
 	}
-	else if (p[tablero[i][j].m_pieza].m_color == Color::N)
+	else if (tablero[posA.x + pos][posA.y + pos].m_ocp)
 	{
-		if ((!tablero[i][j + 1].m_ocp) && j < 7)
+		if (posB.x == posA.x + pos && posB.y == posA.y + pos)
 		{
-			p[tablero[i][j].m_pieza].m_sprite.move(0, 64);
-			tablero[i][j].m_ocp = false;
-			tablero[i][j + 1].m_pieza = p[tablero[i][j].m_pieza].m_nro;
-			tablero[i][j + 1].m_ocp = true;
+			p[k].m_move = true;
+			return true;
 		}
-		else if (tablero[i + 1][j + 1].m_ocp && j > 0 && i > 0)
-		{
-			p[tablero[i][j].m_pieza].m_sprite.move(64, 64);
-			tablero[i][j].m_ocp = false;
-			tablero[i - 1][j - 1].m_pieza = p[tablero[i][j].m_pieza].m_nro;
-			tablero[i - 1][j - 1].m_ocp = true;
-		}
+		else { return false; }
 	}
+	else if (tablero[posA.x - pos][posA.y + pos].m_ocp)
+	{
+		if (posB.x == posA.x - pos && posB.y == posA.y + pos)
+		{
+			p[k].m_move = true;
+			return true;
+		}
+		else { return false; }
+	}
+	else { return false; }
 }
