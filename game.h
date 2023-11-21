@@ -172,25 +172,23 @@ void Game::processEvents()
 				switch (p[m_piece].m_tipo)
 				{
 				case::Tipo::Rey:
-					m_move = true;
+					m_move = MovimientosRey(m_piece, m_newpos, m_oldpos);
+					if (CasillaEnJuego(m_newpos, m_piece)) { m_move = false; }
 					break;
 				case::Tipo::Dama:
-					m_move = true;
+					m_move = MovimientosDama(m_piece, m_newpos, m_oldpos);
 					break;
 				case::Tipo::Torre:
 					m_move = MovimientosTorre(m_piece, m_newpos, m_oldpos);
-					//m_move = true;
 					break;
 				case::Tipo::Alfil:
 					m_move = MovimientosAlfil(m_piece, m_newpos, m_oldpos);
-					//m_move = true;
 					break;
 				case::Tipo::Caballo:
-					m_move = true;
+					m_move = MovimientosCaballo(m_piece, m_newpos, m_oldpos);
 					break;
 				case::Tipo::Peon:
 					m_move = MovimientosPeon(m_piece, m_newpos, m_oldpos);
-					//m_move = true;
 					break;
 				default:
 					break;
@@ -199,6 +197,8 @@ void Game::processEvents()
 
 			if (m_move)
 			{
+				p[m_piece].m_move = true;
+
 				if (!MouseEnCasilla(ajedrez, m_oldpos.x, m_oldpos.y))
 				{
 					if (MouseEnTablero(ajedrez))

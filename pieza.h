@@ -18,7 +18,6 @@ public:
 	{
 		m_sprite.setTexture(t);
 		m_sprite.setScale(3, 3);
-
 	}
 
 	std::string getTipo()
