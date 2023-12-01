@@ -1,65 +1,4 @@
 #pragma once
-#include "casilla.h"
-
-enum class Tipo : int { Rey = 1, Dama, Torre, Alfil, Caballo, Peon };
-enum class Color : int { B = 1, N };
-
-class Pieza
-{
-public:
-	sf::Sprite m_sprite;
-	int m_nro{ -1 };
-	Tipo m_tipo{};
-	Color m_color{};
-	sf::Vector2i m_pos{ -1, -1 };
-	bool m_move = false;
-
-	void setSprite(sf::Texture& t)
-	{
-		m_sprite.setTexture(t);
-		m_sprite.setScale(3, 3);
-	}
-
-	std::string getTipo()
-	{
-		switch (m_tipo)
-		{
-		case::Tipo::Rey:
-			return "Rey";
-		case::Tipo::Dama:
-			return "Dama";
-		case::Tipo::Torre:
-			return "Torre";
-		case::Tipo::Alfil:
-			return "Alfil";
-		case::Tipo::Caballo:
-			return "Caballo";
-		case::Tipo::Peon:
-			return "Peon";
-		default:
-			break;
-		}
-	}
-
-	std::string getColor()
-	{
-		switch (m_color)
-		{
-		case Color::B:
-			return "Blanco";
-		case Color::N:
-			return "Negro";
-		default:
-			break;
-		}
-	}
-
-	Pieza();
-};
-
-Pieza::Pieza() {}
-
-Pieza p[32];
 
 void CargarTextura(sf::Texture& t, std::string path)
 {
@@ -68,7 +7,7 @@ void CargarTextura(sf::Texture& t, std::string path)
 
 void PiezaEnCasilla(Pieza p)
 {
-	std::cout << "\tEntrada en " << p.getTipo() << " " << p.getColor() << "\n";
+	std::cout << "\n\tEntrada en " << p.getTipo() << " " << p.getColor() << "\n";
 }
 
 void CoordenadasMouse(sf::RenderWindow& ajedrez)
@@ -85,14 +24,352 @@ void CoordenadasPieza(int k)
 	std::cout << ", " << p[k].m_sprite.getPosition().y << ")\n";
 }
 
-bool PiezaRival(int k, int l)
+int ReyRival(int piece)
 {
-	if (p[k].m_color == p[l].m_color)
+	switch (p[piece].m_color)
 	{
-		return false;
+	case::Color::B:
+		return 16;		// Rey Negro (Rival)
+	case::Color::N:
+		return 19;		// Rey Blanco (Rival)
+	default:
+		return -1;
 	}
-	else if (p[k].m_color != p[l].m_color)
+}
+
+int SentidoDeAtaque(Pieza Rey, Pieza rival)
+{
+	if (Rey.m_pos.x != rival.m_pos.x && Rey.m_pos.y == rival.m_pos.y)
+	{
+		return 1;		// horizontal
+	}
+	else if (Rey.m_pos.x == rival.m_pos.x && Rey.m_pos.y != rival.m_pos.y)
+	{
+		return 2;		// vertical
+	}
+	else if (Rey.m_pos.x != rival.m_pos.x && Rey.m_pos.y != rival.m_pos.y)
+	{
+		return 3;		// diagonal
+	}
+	return 0;
+}
+
+bool Jaque(sf::Vector2i pos, int k)
+{
+	switch (p[k].m_tipo)
+	{
+	case::Tipo::Dama:
+		for (int u = 0; u < 8; u++)
+		{
+			if (tablero[u][pos.y].m_ocp && u != pos.x)
+			{
+				if (p[tablero[u][pos.y].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[u][pos.y].m_pieza].m_color != p[k].m_color)
+				{
+					sf::Vector2i posRey(u, pos.y);
+					if (!PiezaEnMedio(1, pos, posRey, k))
+					{
+						return true;
+					}
+				}
+			}
+			if (tablero[pos.x][u].m_ocp && u != pos.y)
+			{
+				if (p[tablero[pos.x][u].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x][u].m_pieza].m_color != p[k].m_color)
+				{
+					sf::Vector2i posRey(pos.x, u);
+					if (!PiezaEnMedio(2, pos, posRey, k))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		for (int l = 1; l < 9; l++)
+		{
+			if (tablero[pos.x - l][pos.y - l].m_ocp && (pos.x - l >= 0 && pos.y - l >= 0))
+			{
+				if (p[tablero[pos.x - l][pos.y - l].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x - l][pos.y - l].m_pieza].m_color != p[k].m_color)
+				{
+					sf::Vector2i posRey(pos.x - l, pos.y - l);
+					if (!PiezaEnMedio(3, pos, posRey, k))
+					{
+						return true;
+					}
+				}
+			}
+			if (tablero[pos.x + l][pos.y + l].m_ocp && (pos.x + l <= 7 && pos.y + l <= 7))
+			{
+				if (p[tablero[pos.x + l][pos.y + l].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x + l][pos.y + l].m_pieza].m_color != p[k].m_color)
+				{
+					sf::Vector2i posRey(pos.x + l, pos.y + l);
+					if (!PiezaEnMedio(3, pos, posRey, k))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		for (int r = 1; r < 9; r++)
+		{
+			if (tablero[pos.x - r][pos.y + r].m_ocp && (pos.x - r >= 0 && pos.y + r <= 7))
+			{
+				if (p[tablero[pos.x - r][pos.y + r].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x - r][pos.y + r].m_pieza].m_color != p[k].m_color)
+				{
+					sf::Vector2i posRey(pos.x - r, pos.y + r);
+					if (!PiezaEnMedio(3, pos, posRey, k))
+					{
+						return true;
+					}
+				}
+			}
+			if (tablero[pos.x + r][pos.y - r].m_ocp && (pos.x + r <= 7 && pos.y - r >= 0))
+			{
+				if (p[tablero[pos.x + r][pos.y - r].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x + r][pos.y - r].m_pieza].m_color != p[k].m_color)
+				{
+					sf::Vector2i posRey(pos.x + r, pos.y - r);
+					if (!PiezaEnMedio(3, pos, posRey, k))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		break;
+	case::Tipo::Torre:
+		for (int u = 0; u < 8; u++)
+		{
+			if (tablero[u][pos.y].m_ocp && u != pos.x)
+			{
+				if (p[tablero[u][pos.y].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[u][pos.y].m_pieza].m_color != p[k].m_color)
+				{
+					sf::Vector2i posRey(u, pos.y);
+					if (!PiezaEnMedio(1, pos, posRey, k))
+					{
+						return true;
+					}
+				}
+			}
+			if (tablero[pos.x][u].m_ocp && u != pos.y)
+			{
+				if (p[tablero[pos.x][u].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x][u].m_pieza].m_color != p[k].m_color)
+				{
+					sf::Vector2i posRey(pos.x, u);
+					if (!PiezaEnMedio(2, pos, posRey, k))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		break;
+	case::Tipo::Alfil:
+		for (int l = 1; l < 9; l++)
+		{
+			if (tablero[pos.x - l][pos.y - l].m_ocp && (pos.x - l >= 0 && pos.y - l >= 0))
+			{
+				if (p[tablero[pos.x - l][pos.y - l].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x - l][pos.y - l].m_pieza].m_color != p[k].m_color)
+				{
+					sf::Vector2i posRey(pos.x - l, pos.y - l);
+					if (!PiezaEnMedio(3, pos, posRey, k))
+					{
+						return true;
+					}
+				}
+			}
+			if (tablero[pos.x + l][pos.y + l].m_ocp && (pos.x + l <= 7 && pos.y + l <= 7))
+			{
+				if (p[tablero[pos.x + l][pos.y + l].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x + l][pos.y + l].m_pieza].m_color != p[k].m_color)
+				{
+					sf::Vector2i posRey(pos.x + l, pos.y + l);
+					if (!PiezaEnMedio(3, pos, posRey, k))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		for (int r = 1; r < 9; r++)
+		{
+			if (tablero[pos.x - r][pos.y + r].m_ocp && (pos.x - r >= 0 && pos.y + r <= 7))
+			{
+				if (p[tablero[pos.x - r][pos.y + r].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x - r][pos.y + r].m_pieza].m_color != p[k].m_color)
+				{
+					sf::Vector2i posRey(pos.x - r, pos.y + r);
+					if (!PiezaEnMedio(3, pos, posRey, k))
+					{
+						return true;
+					}
+				}
+			}
+			if (tablero[pos.x + r][pos.y - r].m_ocp && (pos.x + r <= 7 && pos.y - r >= 0))
+			{
+				if (p[tablero[pos.x + r][pos.y - r].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x + r][pos.y - r].m_pieza].m_color != p[k].m_color)
+				{
+					sf::Vector2i posRey(pos.x + r, pos.y - r);
+					if (!PiezaEnMedio(3, pos, posRey, k))
+					{
+						return true;
+					}
+				}
+			}
+		}
+		break;
+	case::Tipo::Caballo:
+		if (tablero[pos.x - 2][pos.y - 1].m_ocp && (pos.x - 2 >= 0 && pos.y - 1 >= 0))
+		{
+			if (p[tablero[pos.x - 2][pos.y - 1].m_pieza].m_tipo == Tipo::Rey &&
+				p[tablero[pos.x - 2][pos.y - 1].m_pieza].m_color != p[k].m_color)
+			{
+				return true;
+			}
+		}
+		if (tablero[pos.x - 2][pos.y + 1].m_ocp && (pos.x - 2 >= 0 && pos.y + 1 <= 7))
+		{
+			if (p[tablero[pos.x - 2][pos.y + 1].m_pieza].m_tipo == Tipo::Rey &&
+				p[tablero[pos.x - 2][pos.y + 1].m_pieza].m_color != p[k].m_color)
+			{
+				return true;
+			}
+		}
+		if (tablero[pos.x + 2][pos.y - 1].m_ocp && (pos.x + 2 <= 7 && pos.y - 1 >= 0))
+		{
+			if (p[tablero[pos.x + 2][pos.y - 1].m_pieza].m_tipo == Tipo::Rey &&
+				p[tablero[pos.x + 2][pos.y - 1].m_pieza].m_color != p[k].m_color)
+			{
+				return true;
+			}
+		}
+		if (tablero[pos.x + 2][pos.y + 1].m_ocp && (pos.x + 2 <= 7 && pos.y + 1 <= 7))
+		{
+			if (p[tablero[pos.x + 2][pos.y + 1].m_pieza].m_tipo == Tipo::Rey &&
+				p[tablero[pos.x + 2][pos.y + 1].m_pieza].m_color != p[k].m_color)
+			{
+				return true;
+			}
+		}
+		if (tablero[pos.x - 1][pos.y - 2].m_ocp && (pos.x - 1 >= 0 && pos.y - 2 >= 0))
+		{
+			if (p[tablero[pos.x - 1][pos.y - 2].m_pieza].m_tipo == Tipo::Rey &&
+				p[tablero[pos.x - 1][pos.y - 2].m_pieza].m_color != p[k].m_color)
+			{
+				return true;
+			}
+		}
+		if (tablero[pos.x + 1][pos.y - 2].m_ocp && (pos.x + 1 <= 7 && pos.y - 2 >= 0))
+		{
+			if (p[tablero[pos.x + 1][pos.y - 2].m_pieza].m_tipo == Tipo::Rey &&
+				p[tablero[pos.x + 1][pos.y - 2].m_pieza].m_color != p[k].m_color)
+			{
+				return true;
+			}
+		}
+		if (tablero[pos.x - 1][pos.y + 2].m_ocp && (pos.x - 1 >= 0 && pos.y + 2 <= 7))
+		{
+			if (p[tablero[pos.x - 1][pos.y + 2].m_pieza].m_tipo == Tipo::Rey &&
+				p[tablero[pos.x - 1][pos.y + 2].m_pieza].m_color != p[k].m_color)
+			{
+				return true;
+			}
+		}
+		if (tablero[pos.x + 1][pos.y + 2].m_ocp && (pos.x + 1 <= 7 && pos.y + 2 <= 7))
+		{
+			if (p[tablero[pos.x + 1][pos.y + 2].m_pieza].m_tipo == Tipo::Rey &&
+				p[tablero[pos.x + 1][pos.y + 2].m_pieza].m_color != p[k].m_color)
+			{
+				return true;
+			}
+		}
+		break;
+	case::Tipo::Peon:
+		if (p[k].m_color == Color::N)
+		{
+			if (tablero[pos.x + 1][pos.y + 1].m_ocp && (pos.x + 1 <= 7 && pos.y + 1 <= 7))
+			{
+				if (p[tablero[pos.x + 1][pos.y + 1].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x + 1][pos.y + 1].m_pieza].m_color != p[k].m_color)
+				{
+					return true;
+				}
+			}
+			if (tablero[pos.x - 1][pos.y + 1].m_ocp && (pos.x - 1 >= 0 && pos.y + 1 <= 7))
+			{
+				if (p[tablero[pos.x - 1][pos.y + 1].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x - 1][pos.y + 1].m_pieza].m_color != p[k].m_color)
+				{
+					return true;
+				}
+			}
+		}
+		else if (p[k].m_color == Color::B)
+		{
+			if (tablero[pos.x + 1][pos.y - 1].m_ocp && (pos.x + 1 <= 7 && pos.y - 1 >= 0))
+			{
+				if (p[tablero[pos.x + 1][pos.y - 1].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x + 1][pos.y - 1].m_pieza].m_color != p[k].m_color)
+				{
+					return true;
+				}
+			}
+			if (tablero[pos.x - 1][pos.y - 1].m_ocp && (pos.x - 1 >= 0 && pos.y - 1 >= 0))
+			{
+				if (p[tablero[pos.x - 1][pos.y - 1].m_pieza].m_tipo == Tipo::Rey &&
+					p[tablero[pos.x - 1][pos.y - 1].m_pieza].m_color != p[k].m_color)
+				{
+					return true;
+				}
+			}
+		}
+		break;
+	default:
+		break;
+	}
+	return false;
+}
+
+bool Ahogado(sf::Vector2i posr, int r)
+{
+	int juego = 0, ocupado = 0, fuera = 0;
+
+	for (int i = -1; i < 2; i++)
+	{
+		for (int j = -1; j < 2; j++)
+		{
+			int x = posr.x + i;
+			int y = posr.y + j;
+			sf::Vector2i arear(x, y);
+
+			if ((x >= 0 && y >= 0) && (x <= 7 && y <= 7) && arear != posr)
+			{
+				if (CasillaEnJuego(arear, r))
+				{
+					juego++;
+				}
+				else if (tablero[x][y].m_ocp && !PiezaRival(r, tablero[x][y].m_pieza))
+				{
+					ocupado++;
+				}
+			}
+			else if (!((x >= 0 && y >= 0) && (x <= 7 && y <= 7)) && arear != posr)
+			{
+				fuera++;
+			}
+		}
+	}
+	if (juego + ocupado + fuera == 8)
 	{
 		return true;
 	}
+	return false;
 }

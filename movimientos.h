@@ -1,8 +1,57 @@
 #pragma once
 
+bool Enroque(int k, sf::Vector2i posA, sf::Vector2i posB)
+{
+	if (!p[k].m_move)
+	{
+		if (posB.x == posA.x - 2 && posB.y == posA.y)
+		{
+			if (tablero[7][posA.y].m_ocp)
+			{
+				if (p[tablero[7][posA.y].m_pieza].m_tipo == Tipo::Torre && !p[tablero[7][posA.y].m_pieza].m_move)
+				{
+					sf::Vector2i posl{ 7, posA.y };
+
+					if (!PiezaEnMedio(1, posB, posl, k) && !CasillaEnJuego(posA, k))
+					{
+						std::cout << "\n\tENROQUE CORTO\n";
+						CargarPiezaEnCasilla(posl.x - 2, posl.y, tablero[posl.x][posl.y].m_pieza,
+							p[tablero[posl.x][posl.y].m_pieza].m_tipo,
+							p[tablero[posl.x][posl.y].m_pieza].m_color);
+						VaciarCasilla(posl.x, posl.y);
+						return true;
+					}
+				}
+			}
+		}
+		else if (posB.x == posA.x + 2 && posB.y == posA.y)
+		{
+			if (tablero[0][posA.y].m_ocp)
+			{
+				if (p[tablero[0][posA.y].m_pieza].m_tipo == Tipo::Torre && !p[tablero[0][posA.y].m_pieza].m_move)
+				{
+					sf::Vector2i posl{ 0, posA.y };
+
+					if (!PiezaEnMedio(1, posB, posl, k) && !CasillaEnJuego(posA, k))
+					{
+						std::cout << "\n\tENROQUE LARGO\n";
+						CargarPiezaEnCasilla(posl.x + 3, posl.y, tablero[posl.x][posl.y].m_pieza,
+							p[tablero[posl.x][posl.y].m_pieza].m_tipo,
+							p[tablero[posl.x][posl.y].m_pieza].m_color);
+						VaciarCasilla(posl.x, posl.y);
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
 bool MovimientosRey(int k, sf::Vector2i posA, sf::Vector2i posB)
 {
-	int posx = 0, posy = 0, pos = 0;
+	int pos = 0;
 
 	switch (p[k].m_color)
 	{
@@ -14,6 +63,21 @@ bool MovimientosRey(int k, sf::Vector2i posA, sf::Vector2i posB)
 		break;
 	default:
 		break;
+	}
+
+	if (tablero[posA.x][posA.y].m_ocp && p[tablero[posA.x][posA.y].m_pieza].m_color == p[k].m_color)
+	{
+		return false;
+	}
+
+	if (CasillaEnJuego(posA, k))
+	{
+		return false;
+	}
+
+	if (Enroque(k, posA, posB))
+	{
+		return true;
 	}
 
 	return (posB.x == posA.x + pos && posB.y == posA.y + pos)
@@ -28,25 +92,23 @@ bool MovimientosRey(int k, sf::Vector2i posA, sf::Vector2i posB)
 
 bool MovimientosDama(int k, sf::Vector2i posA, sf::Vector2i posB)
 {
-	int posx = 0, posy = 0, pos = 0;
+	int posx = 0, posy = 0;
 
 	switch (p[k].m_color)
 	{
 	case Color::B:
 		posx = posB.x - posA.x;
 		posy = posB.y - posA.y;
-		pos = posB.y - posA.y;
 		break;
 	case Color::N:
 		posx = -posB.x + posA.x;
 		posy = -posB.y + posA.y;
-		pos = -posB.y + posA.y;
 		break;
 	default:
 		break;
 	}
 
-	int difx = 1, dify = 1, difI = posx, difJ = posy, dif = pos;
+	int difx = 1, dify = 1, difI = posx, difJ = posy;
 
 	if (difI == 0 && difJ != 0)
 	{
@@ -89,11 +151,11 @@ bool MovimientosDama(int k, sf::Vector2i posA, sf::Vector2i posB)
 		if (posB.x > posA.x) { difx = -1; }
 		if (posB.y > posA.y) { dify = -1; }
 
-		if (dif < 0) { dif = -dif; }
+		if (difJ < 0) { difJ = -difJ; }
 
 		int sumx = difx, sumy = dify;
 
-		for (int i = 0; i < dif - 1; i++)
+		for (int i = 0; i < difJ - 1; i++)
 		{
 			if (tablero[posB.x + difx][posB.y + dify].m_ocp)
 			{
@@ -106,10 +168,10 @@ bool MovimientosDama(int k, sf::Vector2i posA, sf::Vector2i posB)
 
 	if (posB.x != posA.x && posB.y != posA.y)
 	{
-		return (posB.x == posA.x + pos && posB.y == posA.y + pos)
-			|| (posB.x == posA.x - pos && posB.y == posA.y - pos)
-			|| (posB.x == posA.x + pos && posB.y == posA.y - pos)
-			|| (posB.x == posA.x - pos && posB.y == posA.y + pos);
+		return (posB.x == posA.x + posy && posB.y == posA.y + posy)
+			|| (posB.x == posA.x - posy && posB.y == posA.y - posy)
+			|| (posB.x == posA.x + posy && posB.y == posA.y - posy)
+			|| (posB.x == posA.x - posy && posB.y == posA.y + posy);
 	}
 
 	return (posB.x == posA.x + posx && posB.y == posA.y)
@@ -150,6 +212,7 @@ bool MovimientosTorre(int k, sf::Vector2i posA, sf::Vector2i posB)
 		{
 			return false;
 		}
+
 		difx = difx + sumx;
 	}
 
@@ -165,6 +228,7 @@ bool MovimientosTorre(int k, sf::Vector2i posA, sf::Vector2i posB)
 		{
 			return false;
 		}
+
 		dify = dify + sumy;
 	}
 
@@ -206,6 +270,7 @@ bool MovimientosAlfil(int k, sf::Vector2i posA, sf::Vector2i posB)
 		{
 			return false;
 		}
+
 		difx = difx + sumx;		dify = dify + sumy;
 	}
 
@@ -213,6 +278,7 @@ bool MovimientosAlfil(int k, sf::Vector2i posA, sf::Vector2i posB)
 	{
 		return false;
 	}
+
 	return (posB.x == posA.x + pos && posB.y == posA.y + pos)
 		|| (posB.x == posA.x - pos && posB.y == posA.y - pos)
 		|| (posB.x == posA.x + pos && posB.y == posA.y - pos)
@@ -296,5 +362,83 @@ bool MovimientosPeon(int k, sf::Vector2i posA, sf::Vector2i posB)
 			return true;
 		}
 	}
+	return false;
+}
+
+bool MovimientosPosibles(int R)
+{
+	for (int k = 0; k < 32; k++)
+	{
+		if (p[R].m_color == p[k].m_color)
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				for (int j = 0; j < 8; j++)
+				{
+					sf::Vector2i posk(i, j);
+					switch (p[k].m_tipo)
+					{
+					case::Tipo::Rey:
+						if (MovimientosRey(k, posk, p[k].m_pos))
+						{
+							if (PiezaRival(k, tablero[i][j].m_pieza))
+							{
+								return true;
+							}
+						}
+						break;
+					case::Tipo::Dama:
+						if (MovimientosDama(k, posk, p[k].m_pos))
+						{
+							if (PiezaRival(k, tablero[i][j].m_pieza))
+							{
+								return true;
+							}
+						}
+						break;
+					case::Tipo::Torre:
+						if (MovimientosTorre(k, posk, p[k].m_pos))
+						{
+							if (PiezaRival(k, tablero[i][j].m_pieza))
+							{
+								return true;
+							}
+						}
+						break;
+					case::Tipo::Alfil:
+						if (MovimientosAlfil(k, posk, p[k].m_pos))
+						{
+							if (PiezaRival(k, tablero[i][j].m_pieza))
+							{
+								return true;
+							}
+						}
+						break;
+					case::Tipo::Caballo:
+						if (MovimientosCaballo(k, posk, p[k].m_pos))
+						{
+							if (PiezaRival(k, tablero[i][j].m_pieza))
+							{
+								return true;
+							}
+						}
+						break;
+					case::Tipo::Peon:
+						if (MovimientosPeon(k, posk, p[k].m_pos))
+						{
+							if (PiezaRival(k, tablero[i][j].m_pieza))
+							{
+								return true;
+							}
+						}
+						break;
+					default:
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	return false;
 }

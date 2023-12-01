@@ -1,22 +1,4 @@
 #pragma once
-#include "pieza.h"
-#define distancia 96
-
-class Casilla
-{
-public:
-	sf::Sprite m_casilla;
-	bool m_ocp = false;
-	int m_pieza{ -1 };
-
-	void setSprite(sf::Texture& t)
-	{
-		m_casilla.setTexture(t);
-		m_casilla.setScale(3, 3);
-	}
-};
-
-Casilla tablero[8][8];
 
 bool MouseEnCasilla(sf::RenderWindow& ajedrez, int i, int j)
 {
@@ -29,8 +11,8 @@ bool MouseEnCasilla(sf::RenderWindow& ajedrez, int i, int j)
 
 bool MouseEnTablero(sf::RenderWindow& ajedrez)
 {
-	if ((sf::Mouse::getPosition(ajedrez).x > 0 && sf::Mouse::getPosition(ajedrez).x < 768) &&
-		(sf::Mouse::getPosition(ajedrez).y > 0 && sf::Mouse::getPosition(ajedrez).y < 768))
+	if ((sf::Mouse::getPosition(ajedrez).x > 0 && sf::Mouse::getPosition(ajedrez).x < distancia * 8 + distancia) &&
+		(sf::Mouse::getPosition(ajedrez).y > 0 && sf::Mouse::getPosition(ajedrez).y < distancia * 8))
 	{
 		return true;
 	}
@@ -58,19 +40,20 @@ void CoordenadasCasilla(sf::RenderWindow& ajedrez, int i, int j)
 {
 	std::cout << "CASILLA[" << i + 1 << "][" << j + 1 << "] - ";
 	std::cout << "(" << tablero[i][j].m_casilla.getGlobalBounds().getPosition().x;
-	std::cout << ", " << tablero[i][j].m_casilla.getGlobalBounds().getPosition().y << ")\n\n";
+	std::cout << ", " << tablero[i][j].m_casilla.getGlobalBounds().getPosition().y << ")\n";
 }
 
 void CargarPiezaEnCasilla(int i, int j, int k, Tipo tipo, Color color)
 {
 	tablero[i][j].m_ocp = true;
+	p[k].m_juego = true;
 	p[k].m_nro = k;
 	p[k].m_tipo = tipo;
 	p[k].m_color = color;
 	p[k].m_pos.x = i;
 	p[k].m_pos.y = j;
 	tablero[i][j].m_pieza = k;
-	p[k].m_sprite.setPosition(distancia * i, distancia * j);
+	p[k].m_sprite.setPosition(distancia * i + distancia, distancia * j);
 }
 
 void VaciarCasilla(int i, int j)
@@ -79,10 +62,21 @@ void VaciarCasilla(int i, int j)
 	tablero[i][j].m_pieza = -1;
 }
 
-bool PiezaEnMedio(int s, sf::Vector2i posA, sf::Vector2i posl, int k)
+bool PiezaRival(int k, int l)
 {
-	int sentido = s;
+	if (p[k].m_color == p[l].m_color)
+	{
+		return false;
+	}
+	else if (p[k].m_color != p[l].m_color)
+	{
+		return true;
+	}
+	else { return NULL; }
+}
 
+bool PiezaEnMedio(int sentido, sf::Vector2i posA, sf::Vector2i posl, int k)
+{
 	if (sentido == 1)		//horizontal
 	{
 		int inicio = posA.x, fin = posl.x;
@@ -121,18 +115,44 @@ bool PiezaEnMedio(int s, sf::Vector2i posA, sf::Vector2i posl, int k)
 
 		for (int l = 1; l < medio; l++)
 		{
-			if (tablero[posA.x - l][posA.y - l].m_ocp && (posA.x - l >= 0 && posA.y - l >= 0))
+			if (posA.x > posl.x && posA.y > posl.y)
 			{
-				if (tablero[posA.x - l][posA.y - l].m_pieza != p[k].m_nro)
+				if (tablero[posA.x - l][posA.y - l].m_ocp && (posA.x - l >= 0 && posA.y - l >= 0))
 				{
-					return true;
+					if (tablero[posA.x - l][posA.y - l].m_pieza != p[k].m_nro)
+					{
+						return true;
+					}
 				}
 			}
-			if (tablero[posA.x + l][posA.y - l].m_ocp && (posA.x + l <= 7 && posA.y - l >= 0))
+			if (posA.x < posl.x && posA.y > posl.y)
 			{
-				if (tablero[posA.x + l][posA.y - l].m_pieza != p[k].m_nro)
+				if (tablero[posA.x + l][posA.y - l].m_ocp && (posA.x + l <= 7 && posA.y - l >= 0))
 				{
-					return true;
+					if (tablero[posA.x + l][posA.y - l].m_pieza != p[k].m_nro)
+					{
+						return true;
+					}
+				}
+			}
+			if (posA.x > posl.x && posA.y < posl.y)
+			{
+				if (tablero[posA.x - l][posA.y + l].m_ocp && (posA.x - l >= 0 && posA.y + l <= 7))
+				{
+					if (tablero[posA.x - l][posA.y + l].m_pieza != p[k].m_nro)
+					{
+						return true;
+					}
+				}
+			}
+			if (posA.x < posl.x && posA.y < posl.y)
+			{
+				if (tablero[posA.x + l][posA.y + l].m_ocp && (posA.x + l <= 7 && posA.y + l <= 7))
+				{
+					if (tablero[posA.x + l][posA.y + l].m_pieza != p[k].m_nro)
+					{
+						return true;
+					}
 				}
 			}
 		}
@@ -143,7 +163,6 @@ bool PiezaEnMedio(int s, sf::Vector2i posA, sf::Vector2i posl, int k)
 bool CasillaEnJuego(sf::Vector2i pos, int k)
 {
 	sf::Vector2i posl;
-	int pieza = 0;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -155,7 +174,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 				posl.x = i, posl.y = pos.y;
 				if (!PiezaEnMedio(1, pos, posl, k))
 				{
-					pieza++;	if (pos != posl) { return true; }
+					if (pos != posl) { return true; }
 				}
 			}
 		}
@@ -167,7 +186,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 				posl.x = pos.x, posl.y = i;
 				if (!PiezaEnMedio(2, pos, posl, k))
 				{
-					pieza++;	if (pos != posl) { return true; }
+					if (pos != posl) { return true; }
 				}
 			}
 		}
@@ -185,7 +204,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 					posl.x = pos.x - i, posl.y = pos.y - i;
 					if (!PiezaEnMedio(3, pos, posl, k))
 					{
-						pieza++;	if (pos != posl) { return true; }
+						return true;
 					}
 				}
 			}
@@ -200,7 +219,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 					posl.x = pos.x + i, posl.y = pos.y - i;
 					if (!PiezaEnMedio(3, pos, posl, k))
 					{
-						pieza++;	if (pos != posl) { return true; }
+						return true;
 					}
 				}
 			}
@@ -215,7 +234,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 					posl.x = pos.x - i, posl.y = pos.y + i;
 					if (!PiezaEnMedio(3, pos, posl, k))
 					{
-						pieza++;	if (pos != posl) { return true; }
+						return true;
 					}
 				}
 			}
@@ -230,7 +249,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 					posl.x = pos.x + i, posl.y = pos.y + i;
 					if (!PiezaEnMedio(3, pos, posl, k))
 					{
-						pieza++;	if (pos != posl) { return true; }
+						return true;
 					}
 				}
 			}
@@ -243,7 +262,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 		{
 			if (p[tablero[pos.x - 2][pos.y - 1].m_pieza].m_tipo == Tipo::Caballo)
 			{
-				pieza++;	if (pos != posl) { return true; }
+				return true;
 			}
 		}
 	}
@@ -253,7 +272,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 		{
 			if (p[tablero[pos.x - 2][pos.y + 1].m_pieza].m_tipo == Tipo::Caballo)
 			{
-				pieza++;	if (pos != posl) { return true; }
+				return true;
 			}
 		}
 	}
@@ -263,7 +282,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 		{
 			if (p[tablero[pos.x + 2][pos.y - 1].m_pieza].m_tipo == Tipo::Caballo)
 			{
-				pieza++;	if (pos != posl) { return true; }
+				return true;
 			}
 		}
 	}
@@ -273,7 +292,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 		{
 			if (p[tablero[pos.x + 2][pos.y + 1].m_pieza].m_tipo == Tipo::Caballo)
 			{
-				pieza++;	if (pos != posl) { return true; }
+				return true;
 			}
 		}
 	}
@@ -283,7 +302,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 		{
 			if (p[tablero[pos.x - 1][pos.y - 2].m_pieza].m_tipo == Tipo::Caballo)
 			{
-				pieza++;	if (pos != posl) { return true; }
+				return true;
 			}
 		}
 	}
@@ -293,7 +312,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 		{
 			if (p[tablero[pos.x + 1][pos.y - 2].m_pieza].m_tipo == Tipo::Caballo)
 			{
-				pieza++;	if (pos != posl) { return true; }
+				return true;
 			}
 		}
 	}
@@ -303,7 +322,7 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 		{
 			if (p[tablero[pos.x - 1][pos.y + 2].m_pieza].m_tipo == Tipo::Caballo)
 			{
-				pieza++;	if (pos != posl) { return true; }
+				return true;
 			}
 		}
 	}
@@ -313,18 +332,101 @@ bool CasillaEnJuego(sf::Vector2i pos, int k)
 		{
 			if (p[tablero[pos.x + 1][pos.y + 2].m_pieza].m_tipo == Tipo::Caballo)
 			{
-				pieza++;	if (pos != posl) { return true; }
+				return true;
 			}
 		}
 	}
 
-	if (tablero[pos.x][pos.y].m_ocp && p[tablero[pos.x][pos.y].m_pieza].m_color != p[k].m_color)
+	if (p[k].m_color == Color::N)
 	{
-		if (pieza > 1)
+		if (tablero[pos.x - 1][pos.y + 1].m_ocp && (pos.x - 1 >= 0 && pos.y + 1 <= 7))
 		{
-			return true;
+			if (p[tablero[pos.x - 1][pos.y + 1].m_pieza].m_color != p[k].m_color)
+			{
+				if (p[tablero[pos.x - 1][pos.y + 1].m_pieza].m_tipo == Tipo::Peon ||
+					p[tablero[pos.x - 1][pos.y + 1].m_pieza].m_tipo == Tipo::Rey)
+				{
+					return true;
+				}
+			}
+		}
+		if (tablero[pos.x + 1][pos.y + 1].m_ocp && (pos.x + 1 <= 7 && pos.y + 1 <= 7))
+		{
+			if (p[tablero[pos.x + 1][pos.y + 1].m_pieza].m_color != p[k].m_color)
+			{
+				if (p[tablero[pos.x + 1][pos.y + 1].m_pieza].m_tipo == Tipo::Peon ||
+					p[tablero[pos.x + 1][pos.y + 1].m_pieza].m_tipo == Tipo::Rey)
+				{
+					return true;
+				}
+			}
+		}
+	}
+	else if (p[k].m_color == Color::B)
+	{
+		if (tablero[pos.x + 1][pos.y - 1].m_ocp && (pos.x + 1 <= 7 && pos.y - 1 >= 0))
+		{
+			if (p[tablero[pos.x + 1][pos.y - 1].m_pieza].m_color != p[k].m_color)
+			{
+				if (p[tablero[pos.x + 1][pos.y - 1].m_pieza].m_tipo == Tipo::Peon ||
+					p[tablero[pos.x + 1][pos.y - 1].m_pieza].m_tipo == Tipo::Rey)
+				{
+					return true;
+				}
+			}
+		}
+		if (tablero[pos.x - 1][pos.y - 1].m_ocp && (pos.x - 1 >= 0 && pos.y - 1 >= 0))
+		{
+			if (p[tablero[pos.x - 1][pos.y - 1].m_pieza].m_color != p[k].m_color)
+			{
+				if (p[tablero[pos.x - 1][pos.y - 1].m_pieza].m_tipo == Tipo::Peon ||
+					p[tablero[pos.x - 1][pos.y - 1].m_pieza].m_tipo == Tipo::Rey)
+				{
+					return true;
+				}
+			}
 		}
 	}
 
+	if (tablero[pos.x + 1][pos.y].m_ocp && (pos.x + 1 <= 7))
+	{
+		if (p[tablero[pos.x + 1][pos.y].m_pieza].m_color != p[k].m_color)
+		{
+			if (p[tablero[pos.x + 1][pos.y].m_pieza].m_tipo == Tipo::Rey)
+			{
+				return true;
+			}
+		}
+	}
+	if (tablero[pos.x][pos.y + 1].m_ocp && (pos.y + 1 <= 7))
+	{
+		if (p[tablero[pos.x][pos.y + 1].m_pieza].m_color != p[k].m_color)
+		{
+			if (p[tablero[pos.x][pos.y + 1].m_pieza].m_tipo == Tipo::Rey)
+			{
+				return true;
+			}
+		}
+	}
+	if (tablero[pos.x - 1][pos.y].m_ocp && (pos.x - 1 >= 0))
+	{
+		if (p[tablero[pos.x - 1][pos.y].m_pieza].m_color != p[k].m_color)
+		{
+			if (p[tablero[pos.x - 1][pos.y].m_pieza].m_tipo == Tipo::Rey)
+			{
+				return true;
+			}
+		}
+	}
+	if (tablero[pos.x][pos.y - 1].m_ocp && (pos.y - 1 >= 0))
+	{
+		if (p[tablero[pos.x][pos.y - 1].m_pieza].m_color != p[k].m_color)
+		{
+			if (p[tablero[pos.x][pos.y - 1].m_pieza].m_tipo == Tipo::Rey)
+			{
+				return true;
+			}
+		}
+	}
 	return false;
 }
