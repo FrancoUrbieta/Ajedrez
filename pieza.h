@@ -21,6 +21,7 @@ public:
 	void setSprite(sf::Texture& t);
 	void ColocarPieza(int i, int j, int k, Tipo tipo, Color color);
 	void RemoverPieza(int i, int j, int cant);
+	void ConvertirPieza(Tipo tipo);
 	std::string getTipo();
 	std::string getColor();
 	int getReyNum(Color);

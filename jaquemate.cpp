@@ -366,17 +366,21 @@ bool PiezaClavada(Pieza k, sf::Vector2i posA, sf::Vector2i posB, int R)
 {
 	Pieza p;
 	Tablero(posB.x, posB.y).VaciarCasilla();
+
 	if (Tablero(posA.x, posA.y).m_ocp) {
 		p = P(Tablero(posA.x, posA.y).m_pieza);
 	}
+
 	k.ColocarPieza(posA.x, posA.y, k.m_nro, k.m_tipo, k.m_color);
 	if (CasillaEnJuego(P(R).m_pos, R))
 	{
 		Tablero(posA.x, posA.y).VaciarCasilla();
 		k.ColocarPieza(posB.x, posB.y, k.m_nro, k.m_tipo, k.m_color);
+
 		if (p.m_enjuego) {
 			P(p.m_nro).ColocarPieza(posA.x, posA.y, p.m_nro, p.m_tipo, p.m_color);
 		}
+
 		if (CasillaEnJuego(P(R).m_pos, R))
 		{
 			return false;
@@ -386,9 +390,11 @@ bool PiezaClavada(Pieza k, sf::Vector2i posA, sf::Vector2i posB, int R)
 	}
 	Tablero(posA.x, posA.y).VaciarCasilla();
 	k.ColocarPieza(posB.x, posB.y, k.m_nro, k.m_tipo, k.m_color);
+
 	if (p.m_enjuego) {
 		P(p.m_nro).ColocarPieza(posA.x, posA.y, p.m_nro, p.m_tipo, p.m_color);
 	}
+
 	return false;
 }
 
@@ -436,18 +442,6 @@ bool Ahogado(sf::Vector2i posR, int Rey)
 		return true;
 	}
 	return false;
-}
-
-sf::Vector2i DistanciaEntrePiezas(sf::Vector2i posA, sf::Vector2i posB)
-{
-	int disx = posA.x - posB.x, disy = posA.y - posB.y;
-
-	if (disx < 0) { disx = -disx; }
-	if (disy < 0) { disy = -disy; }
-
-	sf::Vector2i dis(disx, disy);
-
-	return dis;
 }
 
 bool Jaque(sf::Vector2i pos, int k)
@@ -734,49 +728,67 @@ bool Jaque(sf::Vector2i pos, int k)
 	return false;
 }
 
+bool CubrirRey(int piezajaque, int piece, sf::Vector2i posA, sf::Vector2i posB)
+{
+	int Rey = ReyRival(piezajaque);
+	if (posA == P(piezajaque).m_pos)
+	{
+		Tablero(posB.x, posB.y).VaciarCasilla();
+		Tablero(P(piezajaque).m_pos.x, P(piezajaque).m_pos.y).VaciarCasilla();
+		if (CasillaEnJuego(P(Rey).m_pos, Rey))
+		{
+			P(piece).ColocarPieza(posB.x, posB.y, piece, P(piece).m_tipo, P(piece).m_color);
+			P(piezajaque).ColocarPieza(P(piezajaque).m_pos.x, P(piezajaque).m_pos.y,
+				piezajaque, P(piezajaque).m_tipo, P(piezajaque).m_color);
+		}
+		else if (!CasillaEnJuego(P(Rey).m_pos, Rey))
+		{
+			P(piece).ColocarPieza(posB.x, posB.y, piece, P(piece).m_tipo, P(piece).m_color);
+			P(piezajaque).ColocarPieza(P(piezajaque).m_pos.x, P(piezajaque).m_pos.y,
+				piezajaque, P(piezajaque).m_tipo, P(piezajaque).m_color);
+			return true;
+		}
+	}
+	else if (posA != P(piezajaque).m_pos && !Tablero(posA.x, posA.y).m_ocp)
+	{
+		int angulo = SentidoDeAtaque(P(Rey), P(piezajaque));
+		P(piece).ColocarPieza(posA.x, posA.y, piece, P(piece).m_tipo, P(piece).m_color);
+		if (!PiezaEnMedio(angulo, P(Rey).m_pos, P(piezajaque).m_pos, Rey))
+		{
+			Tablero(posA.x, posA.y).VaciarCasilla();
+			P(piece).ColocarPieza(posB.x, posB.y, piece, P(piece).m_tipo, P(piece).m_color);
+		}
+		else if (PiezaEnMedio(angulo, P(Rey).m_pos, P(piezajaque).m_pos, Rey))
+		{
+			Tablero(posA.x, posA.y).VaciarCasilla();
+			P(piece).ColocarPieza(posB.x, posB.y, piece, P(piece).m_tipo, P(piece).m_color);
+			return true;
+		}
+	}
+	return false;
+}
+
 bool SalvarRey(int R, int Atk)
 {
-	sf::Vector2i dis = DistanciaEntrePiezas(P(R).m_pos, P(Atk).m_pos), posR;
-	int posx = 0, posy = 0;
-
-	if (P(R).m_pos.x < P(Atk).m_pos.x) { posx = 1; }
-	else if (P(R).m_pos.x > P(Atk).m_pos.x) { posx = -1; }
-
-	if (P(R).m_pos.y < P(Atk).m_pos.y) { posy = 1; }
-	else if (P(R).m_pos.y > P(Atk).m_pos.y) { posy = -1; }
-
-	if (dis.x != 0 && dis.y == 0)
+	for (int k = 0; k < 32; k++)
 	{
-		for (int i = 1; i < dis.x + 1; i++)
+		if (P(R).m_color == P(k).m_color && P(k).m_enjuego)
 		{
-			posR.x = P(R).m_pos.x + posx * i; posR.y = P(R).m_pos.y;
-			if (CasillaEnJuego(posR, Atk))
+			for (int i = 0; i < 8; i++)
 			{
-				if (MovimientosDisponibles(P(R)))
+				for (int j = 0; j < 8; j++)
 				{
-					return true;
+					sf::Vector2i posk(i, j);
+					if (CubrirRey(Atk, k, posk, P(k).m_pos))
+					{
+						if (MovimientoPosible(k, posk))
+						{
+							return true;
+						}
+					}
 				}
 			}
 		}
 	}
-	else if (dis.x == 0 && dis.y != 0)
-	{
-		for (int j = 1; j < dis.y + 1; j++)
-		{
-			posR.x = P(R).m_pos.x;	posR.y = P(R).m_pos.y + posx * j;
-			if (CasillaEnJuego(posR, Atk))
-			{
-				if (MovimientosDisponibles(P(R)))
-				{
-					return true;
-				}
-			}
-		}
-	}
-	else if (dis.x != 0 && dis.y != 0)
-	{
-
-	}
-
 	return false;
 }

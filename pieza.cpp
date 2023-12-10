@@ -34,14 +34,19 @@ void Pieza::RemoverPieza(int i, int j, int cant)
 	Tablero(i, j).VaciarCasilla();
 	if (m_color == Color::B)
 	{
-		m_sprite.setPosition((distancia / 2), (distancia / 2) * (18 - cant));
+		m_sprite.setPosition(0, (distancia / 2) * (18 - cant));
 		m_sprite.scale(0.5, 0.5);
 	}
 	else if (m_color == Color::N)
 	{
-		m_sprite.setPosition(distancia * 9, (distancia / 2) * (cant + 1));
+		m_sprite.setPosition(distancia * 10 - (distancia / 2), (distancia / 2) * (cant + 1));
 		m_sprite.scale(0.5, 0.5);
 	}
+}
+
+void Pieza::ConvertirPieza(Tipo tipo)
+{
+	m_tipo = tipo;
 }
 
 std::string Pieza::getTipo()

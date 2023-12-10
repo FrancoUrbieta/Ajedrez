@@ -8,8 +8,8 @@ bool PiezaClavada(Pieza k, sf::Vector2i posA, sf::Vector2i posB, int R);
 
 bool Ahogado(sf::Vector2i posR, int Rey);
 
-sf::Vector2i DistanciaEntrePiezas(sf::Vector2i posA, sf::Vector2i posB);
-
 bool Jaque(sf::Vector2i pos, int k);
+
+bool CubrirRey(int piezajaque, int piece, sf::Vector2i posA, sf::Vector2i posB);
 
 bool SalvarRey(int R, int Atk);

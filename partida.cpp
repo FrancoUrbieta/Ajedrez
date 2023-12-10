@@ -5,8 +5,8 @@
 
 bool MouseEnTablero(sf::RenderWindow& ajedrez)
 {
-	if ((sf::Mouse::getPosition(ajedrez).x > distancia && sf::Mouse::getPosition(ajedrez).x < distancia * 8 + distancia) &&
-		(sf::Mouse::getPosition(ajedrez).y > distancia && sf::Mouse::getPosition(ajedrez).y < distancia * 8 + distancia))
+	if ((sf::Mouse::getPosition(ajedrez).x > 0 && sf::Mouse::getPosition(ajedrez).x < distancia * 10) &&
+		(sf::Mouse::getPosition(ajedrez).y > 0 && sf::Mouse::getPosition(ajedrez).y < distancia * 10))
 	{
 		return true;
 	}
@@ -16,6 +16,24 @@ bool MouseEnTablero(sf::RenderWindow& ajedrez)
 bool MouseEnCasilla(sf::Vector2i& mouse, int i, int j)
 {
 	if (Tablero(i, j).m_casilla.getGlobalBounds().contains(mouse.x, mouse.y))
+	{
+		return true;
+	}
+	else { return false; }
+}
+
+bool Abandonar(sf::Vector2i& mouse, sf::RectangleShape& abandonar)
+{
+	if (abandonar.getGlobalBounds().contains(mouse.x, mouse.y))
+	{
+		return true;
+	}
+	else { return false; }
+}
+
+bool Tablas(sf::Vector2i& mouse, sf::RectangleShape& tablas)
+{
+	if (tablas.getGlobalBounds().contains(mouse.x, mouse.y))
 	{
 		return true;
 	}

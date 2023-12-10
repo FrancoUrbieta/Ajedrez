@@ -50,7 +50,6 @@ bool Enroque(int k, sf::Vector2i posA, sf::Vector2i posB)
 			}
 		}
 	}
-
 	return false;
 }
 
@@ -61,5 +60,37 @@ bool CapturaAlPaso(int k, sf::Vector2i posA, sf::Vector2i posB)
 
 bool Coronacion(int k, sf::Vector2i posA, sf::Vector2i posB)
 {
+	if (posA != posB)
+	{
+		if (P(k).m_color == Color::N)
+		{
+			if (posA.y == 7)
+			{
+				return true;
+			}
+		}
+		else if (P(k).m_color == Color::B)
+		{
+			if (posA.y == 0)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool Conversion(sf::Vector2i mouse, Pieza& p, sf::Vector2i pos)
+{
+	for (int k = 0; k < 32; k++)
+	{
+		if (P(k).m_sprite.getGlobalBounds().contains(mouse.x, mouse.y))
+		{
+			if (P(k).m_tipo != Tipo::Peon && P(k).m_tipo != Tipo::Rey)
+			{
+				return true;
+			}
+		}
+	}
 	return false;
 }

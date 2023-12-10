@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#define escala 2.5
+#define escala 2.125
 #define distancia 32 * escala
 
 class Casilla

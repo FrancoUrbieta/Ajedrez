@@ -27,5 +27,3 @@ Casilla& Tablero(int i, int j)
 {
 	return tablero[i][j];
 }
-
-

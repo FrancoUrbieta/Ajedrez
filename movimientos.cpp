@@ -33,11 +33,6 @@ bool MovimientosRey(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 		return false;
 	}
 
-	if (Enroque(p.m_nro, posA, posB))
-	{
-		return true;
-	}
-
 	return (posB.x == posA.x + pos && posB.y == posA.y + pos)
 		|| (posB.x == posA.x + pos && posB.y == posA.y - pos)
 		|| (posB.x == posA.x - pos && posB.y == posA.y - pos)
@@ -322,6 +317,112 @@ bool MovimientosPeon(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 	return false;
 }
 
+bool MovimientoPosible(int k, sf::Vector2i posk)
+{
+	switch (P(k).m_tipo)
+	{
+	case::Tipo::Dama:
+		if (MovimientosDama(P(k), posk, P(k).m_pos))
+		{
+			if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
+			{
+				if (Tablero(posk.x, posk.y).m_ocp)
+				{
+					if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+					{
+						return true;
+					}
+				}
+				else if (!Tablero(posk.x, posk.y).m_ocp)
+				{
+					return true;
+				}
+			}
+		}
+		break;
+	case::Tipo::Torre:
+		if (MovimientosTorre(P(k), posk, P(k).m_pos))
+		{
+			if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
+			{
+				if (Tablero(posk.x, posk.y).m_ocp)
+				{
+					if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+					{
+						return true;
+					}
+				}
+				else if (!Tablero(posk.x, posk.y).m_ocp)
+				{
+					return true;
+				}
+			}
+		}
+		break;
+	case::Tipo::Alfil:
+		if (MovimientosAlfil(P(k), posk, P(k).m_pos))
+		{
+			if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
+			{
+				if (Tablero(posk.x, posk.y).m_ocp)
+				{
+					if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+					{
+						return true;
+					}
+				}
+				else if (!Tablero(posk.x, posk.y).m_ocp)
+				{
+					return true;
+				}
+			}
+		}
+		break;
+	case::Tipo::Caballo:
+		if (MovimientosCaballo(P(k), posk, P(k).m_pos))
+		{
+			if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
+			{
+				if (Tablero(posk.x, posk.y).m_ocp)
+				{
+					if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+					{
+						return true;
+					}
+				}
+				else if (!Tablero(posk.x, posk.y).m_ocp)
+				{
+					return true;
+				}
+			}
+		}
+		break;
+	case::Tipo::Peon:
+		if (MovimientosPeon(P(k), posk, P(k).m_pos))
+		{
+			if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
+			{
+				if (Tablero(posk.x, posk.y).m_ocp)
+				{
+					if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+					{
+						return true;
+					}
+				}
+				else if (!Tablero(posk.x, posk.y).m_ocp)
+				{
+					return true;
+				}
+			}
+		}
+		break;
+	default:
+		break;
+	}
+
+	return false;
+}
+
 bool MovimientosDisponibles(Pieza& R)
 {
 	for (int k = 0; k < 32; k++)
@@ -333,69 +434,13 @@ bool MovimientosDisponibles(Pieza& R)
 				for (int j = 0; j < 8; j++)
 				{
 					sf::Vector2i posk(i, j);
-					switch (P(k).m_tipo)
+					if (MovimientoPosible(k, posk))
 					{
-					case::Tipo::Rey:
-						if (MovimientosRey(P(k), posk, P(k).m_pos))
-						{
-							if (PiezaRival(P(k), P(Tablero(i, j).m_pieza)))
-							{
-								return true;
-							}
-						}
-						break;
-					case::Tipo::Dama:
-						if (MovimientosDama(P(k), posk, P(k).m_pos))
-						{
-							if (PiezaRival(P(k), P(Tablero(i, j).m_pieza)))
-							{
-								return true;
-							}
-						}
-						break;
-					case::Tipo::Torre:
-						if (MovimientosTorre(P(k), posk, P(k).m_pos))
-						{
-							if (PiezaRival(P(k), P(Tablero(i, j).m_pieza)))
-							{
-								return true;
-							}
-						}
-						break;
-					case::Tipo::Alfil:
-						if (MovimientosAlfil(P(k), posk, P(k).m_pos))
-						{
-							if (PiezaRival(P(k), P(Tablero(i, j).m_pieza)))
-							{
-								return true;
-							}
-						}
-						break;
-					case::Tipo::Caballo:
-						if (MovimientosCaballo(P(k), posk, P(k).m_pos))
-						{
-							if (PiezaRival(P(k), P(Tablero(i, j).m_pieza)))
-							{
-								return true;
-							}
-						}
-						break;
-					case::Tipo::Peon:
-						if (MovimientosPeon(P(k), posk, P(k).m_pos))
-						{
-							if (PiezaRival(P(k), P(Tablero(i, j).m_pieza)))
-							{
-								return true;
-							}
-						}
-						break;
-					default:
-						break;
+						return true;
 					}
 				}
 			}
 		}
 	}
-
 	return false;
 }
