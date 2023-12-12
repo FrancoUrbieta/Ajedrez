@@ -5,17 +5,17 @@
 
 class Casilla
 {
-public:
-	sf::Sprite m_casilla;
-	bool m_ocp = false;
-	int m_pieza{ -1 };
+	public:
+		sf::Sprite m_casilla;
+		bool m_ocp = false;
+		int m_pieza{ -1 };
 
-	Casilla();
+		Casilla();
 
-	void setSprite(Casilla&, sf::Texture&);
+		void setSprite(Casilla&, sf::Texture&);
 
-	void VaciarCasilla();
-	void LlenarCasilla(int);
+		void VaciarCasilla();
+		void LlenarCasilla(int);
 };
 
 Casilla& Tablero(int, int);

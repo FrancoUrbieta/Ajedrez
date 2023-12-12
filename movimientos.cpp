@@ -1,26 +1,21 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "casilla.h"
-#include "pieza.h"
-#include "jaquemate.h"
-#include "jugadas.h"
-#include "movimientos.h"
-#include "partida.h"
+#include "game.h"
 
-bool MovimientosRey(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
+bool Game::MovimientosRey(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 {
 	int pos = 0;
 
 	switch (p.m_color)
 	{
-	case Color::B:
-		pos = 1;
-		break;
-	case Color::N:
-		pos = -1;
-		break;
-	default:
-		break;
+		case Color::B:
+			pos = 1;
+			break;
+		case Color::N:
+			pos = -1;
+			break;
+		default:
+			break;
 	}
 
 	if (Tablero(posA.x, posA.y).m_ocp && P(Tablero(posA.x, posA.y).m_pieza).m_color == p.m_color)
@@ -43,22 +38,22 @@ bool MovimientosRey(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 		|| (posB.x == posA.x && posB.y == posA.y - pos);
 }
 
-bool MovimientosDama(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
+bool Game::MovimientosDama(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 {
 	int posx = 0, posy = 0;
 
 	switch (p.m_color)
 	{
-	case Color::B:
-		posx = posB.x - posA.x;
-		posy = posB.y - posA.y;
-		break;
-	case Color::N:
-		posx = -posB.x + posA.x;
-		posy = -posB.y + posA.y;
-		break;
-	default:
-		break;
+		case Color::B:
+			posx = posB.x - posA.x;
+			posy = posB.y - posA.y;
+			break;
+		case Color::N:
+			posx = -posB.x + posA.x;
+			posy = -posB.y + posA.y;
+			break;
+		default:
+			break;
 	}
 
 	int difx = 1, dify = 1, difI = posx, difJ = posy;
@@ -75,7 +70,7 @@ bool MovimientosDama(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 		{
 			if (Tablero(posB.x, posB.y + dify).m_ocp)
 			{
-				std::cout << "\nOCUPADO\n";
+				//std::cout << "\nOCUPADO\n";
 				return false;
 			}
 			dify = dify + sumy;
@@ -93,7 +88,7 @@ bool MovimientosDama(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 		{
 			if (Tablero(posB.x + difx, posB.y).m_ocp)
 			{
-				std::cout << "\nOCUPADO\n";
+				//std::cout << "\nOCUPADO\n";
 				return false;
 			}
 			difx = difx + sumx;
@@ -112,7 +107,7 @@ bool MovimientosDama(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 		{
 			if (Tablero(posB.x + difx, posB.y + dify).m_ocp)
 			{
-				std::cout << "\nOCUPADO\n";
+				//std::cout << "\nOCUPADO\n";
 				return false;
 			}
 			difx = difx + sumx;		dify = dify + sumy;
@@ -133,22 +128,22 @@ bool MovimientosDama(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 		|| (posB.x == posA.x && posB.y == posA.y - posy);
 }
 
-bool MovimientosTorre(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
+bool Game::MovimientosTorre(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 {
 	int posx = 0, posy = 0;
 
 	switch (p.m_color)
 	{
-	case Color::B:
-		posx = posB.x - posA.x;
-		posy = posB.y - posA.y;
-		break;
-	case Color::N:
-		posx = -posB.x + posA.x;
-		posy = -posB.y + posA.y;
-		break;
-	default:
-		break;
+		case Color::B:
+			posx = posB.x - posA.x;
+			posy = posB.y - posA.y;
+			break;
+		case Color::N:
+			posx = -posB.x + posA.x;
+			posy = -posB.y + posA.y;
+			break;
+		default:
+			break;
 	}
 
 	int difx = 1, dify = 1, difI = posx, difJ = posy;
@@ -191,20 +186,20 @@ bool MovimientosTorre(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 		|| (posB.x == posA.x && posB.y == posA.y - posy);
 }
 
-bool MovimientosAlfil(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
+bool Game::MovimientosAlfil(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 {
 	int pos = 0;
 
 	switch (p.m_color)
 	{
-	case Color::B:
-		pos = posB.x - posA.x;
-		break;
-	case Color::N:
-		pos = -posB.x + posA.x;
-		break;
-	default:
-		break;
+		case Color::B:
+			pos = posB.x - posA.x;
+			break;
+		case Color::N:
+			pos = -posB.x + posA.x;
+			break;
+		default:
+			break;
 	}
 
 	int difx = 1, dify = 1, dif = pos;
@@ -237,20 +232,20 @@ bool MovimientosAlfil(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 		|| (posB.x == posA.x - pos && posB.y == posA.y + pos);
 }
 
-bool MovimientosCaballo(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
+bool Game::MovimientosCaballo(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 {
 	int pos = 0;
 
 	switch (p.m_color)
 	{
-	case Color::B:
-		pos = 1;
-		break;
-	case Color::N:
-		pos = -1;
-		break;
-	default:
-		break;
+		case Color::B:
+			pos = 1;
+			break;
+		case Color::N:
+			pos = -1;
+			break;
+		default:
+			break;
 	}
 
 	return (posB.x == posA.x + pos && posB.y == posA.y + pos * 2)
@@ -263,20 +258,20 @@ bool MovimientosCaballo(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 		|| (posB.x == posA.x - pos * 2 && posB.y == posA.y - pos);
 }
 
-bool MovimientosPeon(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
+bool Game::MovimientosPeon(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 {
 	int pos = 0;
 
 	switch (p.m_color)
 	{
-	case Color::B:
-		pos = 1;
-		break;
-	case Color::N:
-		pos = -1;
-		break;
-	default:
-		break;
+		case Color::B:
+			pos = 1;
+			break;
+		case Color::N:
+			pos = -1;
+			break;
+		default:
+			break;
 	}
 
 	if (!Tablero(posA.x, posA.y).m_ocp)
@@ -317,113 +312,113 @@ bool MovimientosPeon(Pieza& p, sf::Vector2i posA, sf::Vector2i posB)
 	return false;
 }
 
-bool MovimientoPosible(int k, sf::Vector2i posk)
+bool Game::MovimientoPosible(int k, sf::Vector2i posk)
 {
 	switch (P(k).m_tipo)
 	{
-	case::Tipo::Dama:
-		if (MovimientosDama(P(k), posk, P(k).m_pos))
-		{
-			if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
+		case::Tipo::Dama:
+			if (MovimientosDama(P(k), posk, P(k).m_pos))
 			{
-				if (Tablero(posk.x, posk.y).m_ocp)
+				if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
 				{
-					if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+					if (Tablero(posk.x, posk.y).m_ocp)
+					{
+						if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+						{
+							return true;
+						}
+					}
+					else if (!Tablero(posk.x, posk.y).m_ocp)
 					{
 						return true;
 					}
 				}
-				else if (!Tablero(posk.x, posk.y).m_ocp)
-				{
-					return true;
-				}
 			}
-		}
-		break;
-	case::Tipo::Torre:
-		if (MovimientosTorre(P(k), posk, P(k).m_pos))
-		{
-			if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
+			break;
+		case::Tipo::Torre:
+			if (MovimientosTorre(P(k), posk, P(k).m_pos))
 			{
-				if (Tablero(posk.x, posk.y).m_ocp)
+				if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
 				{
-					if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+					if (Tablero(posk.x, posk.y).m_ocp)
+					{
+						if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+						{
+							return true;
+						}
+					}
+					else if (!Tablero(posk.x, posk.y).m_ocp)
 					{
 						return true;
 					}
 				}
-				else if (!Tablero(posk.x, posk.y).m_ocp)
-				{
-					return true;
-				}
 			}
-		}
-		break;
-	case::Tipo::Alfil:
-		if (MovimientosAlfil(P(k), posk, P(k).m_pos))
-		{
-			if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
+			break;
+		case::Tipo::Alfil:
+			if (MovimientosAlfil(P(k), posk, P(k).m_pos))
 			{
-				if (Tablero(posk.x, posk.y).m_ocp)
+				if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
 				{
-					if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+					if (Tablero(posk.x, posk.y).m_ocp)
+					{
+						if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+						{
+							return true;
+						}
+					}
+					else if (!Tablero(posk.x, posk.y).m_ocp)
 					{
 						return true;
 					}
 				}
-				else if (!Tablero(posk.x, posk.y).m_ocp)
-				{
-					return true;
-				}
 			}
-		}
-		break;
-	case::Tipo::Caballo:
-		if (MovimientosCaballo(P(k), posk, P(k).m_pos))
-		{
-			if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
+			break;
+		case::Tipo::Caballo:
+			if (MovimientosCaballo(P(k), posk, P(k).m_pos))
 			{
-				if (Tablero(posk.x, posk.y).m_ocp)
+				if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
 				{
-					if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+					if (Tablero(posk.x, posk.y).m_ocp)
+					{
+						if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+						{
+							return true;
+						}
+					}
+					else if (!Tablero(posk.x, posk.y).m_ocp)
 					{
 						return true;
 					}
 				}
-				else if (!Tablero(posk.x, posk.y).m_ocp)
-				{
-					return true;
-				}
 			}
-		}
-		break;
-	case::Tipo::Peon:
-		if (MovimientosPeon(P(k), posk, P(k).m_pos))
-		{
-			if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
+			break;
+		case::Tipo::Peon:
+			if (MovimientosPeon(P(k), posk, P(k).m_pos))
 			{
-				if (Tablero(posk.x, posk.y).m_ocp)
+				if (!PiezaClavada(P(k), posk, P(k).m_pos, P(k).getReyNum(P(k).m_color)))
 				{
-					if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+					if (Tablero(posk.x, posk.y).m_ocp)
+					{
+						if (PiezaRival(P(k), P(Tablero(posk.x, posk.y).m_pieza)))
+						{
+							return true;
+						}
+					}
+					else if (!Tablero(posk.x, posk.y).m_ocp)
 					{
 						return true;
 					}
 				}
-				else if (!Tablero(posk.x, posk.y).m_ocp)
-				{
-					return true;
-				}
 			}
-		}
-		break;
-	default:
-		break;
+			break;
+		default:
+			break;
 	}
 
 	return false;
 }
 
-bool MovimientosDisponibles(Pieza& R)
+bool Game::MovimientosDisponibles(Pieza& R)
 {
 	for (int k = 0; k < 32; k++)
 	{

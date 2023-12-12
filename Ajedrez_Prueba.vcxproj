@@ -146,10 +146,6 @@
     <ClInclude Include="casilla.h" />
     <ClInclude Include="debugging.h" />
     <ClInclude Include="game.h" />
-    <ClInclude Include="jaquemate.h" />
-    <ClInclude Include="jugadas.h" />
-    <ClInclude Include="movimientos.h" />
-    <ClInclude Include="partida.h" />
     <ClInclude Include="pieza.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
