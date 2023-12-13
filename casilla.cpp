@@ -3,10 +3,10 @@
 
 Casilla::Casilla() {}
 
-void Casilla::setSprite(Casilla& casilla, sf::Texture& t)
+void Casilla::setSprite(sf::Texture& t)
 {
-	casilla.m_casilla.setTexture(t);
-	casilla.m_casilla.setScale(escala, escala);
+	m_casilla.setTexture(t);
+	m_casilla.setScale(escala, escala);
 }
 
 void Casilla::VaciarCasilla()

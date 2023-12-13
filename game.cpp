@@ -383,12 +383,9 @@ void Game::ProcessEvents()
 								else if (Tablero(m_newpos.x, m_newpos.y).m_ocp)
 								{
 									if (PiezaRival(P(Tablero(m_newpos.x, m_newpos.y).m_pieza), P(Tablero(m_oldpos.x, m_oldpos.y).m_pieza)))
-									{
-										if (!m_jugada)
-										{
-											CapturarPieza(P(m_piece), P(Tablero(m_newpos.x, m_newpos.y).m_pieza),
+									{									
+										CapturarPieza(P(m_piece), P(Tablero(m_newpos.x, m_newpos.y).m_pieza),
 												m_newpos);
-										}
 										m_lastoldpos = m_oldpos;
 									}
 									else if (!PiezaRival(P(Tablero(m_newpos.x, m_newpos.y).m_pieza), P(Tablero(m_oldpos.x, m_oldpos.y).m_pieza)))
@@ -635,13 +632,13 @@ void Game::Render()
 		{
 			if ((j % 2 == 0 && i % 2 == 0) || (j % 2 == 1 && i % 2 == 1))
 			{
-				Tablero(i, j).setSprite(Tablero(i, j), casilla[0]);
+				Tablero(i, j).setSprite(casilla[0]);
 				Tablero(i, j).m_casilla.setPosition(sf::Vector2f(distancia * i + distancia,
 					distancia * j + distancia));
 			}
 			else if ((j % 2 == 1 && i % 2 == 0) || (j % 2 == 0 && i % 2 == 1))
 			{
-				Tablero(i, j).setSprite(Tablero(i, j), casilla[1]);
+				Tablero(i, j).setSprite(casilla[1]);
 				Tablero(i, j).m_casilla.setPosition(sf::Vector2f(distancia * i + distancia,
 					distancia * j + distancia));
 			}

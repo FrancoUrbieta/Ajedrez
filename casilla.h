@@ -12,7 +12,7 @@ class Casilla
 
 		Casilla();
 
-		void setSprite(Casilla&, sf::Texture&);
+		void setSprite(sf::Texture&);
 
 		void VaciarCasilla();
 		void LlenarCasilla(int);

@@ -41,7 +41,10 @@ bool Game::PiezaClavada(Pieza k, sf::Vector2i posA, sf::Vector2i posB, int R)
 void Game::CapturarPieza(Pieza& k, Pieza& l, sf::Vector2i newpos)
 {
 	m_captura = true;
-	m_mensaje = "PIEZA CAPTURADA";
+	if (!m_jugada)
+	{
+		m_mensaje = "PIEZA CAPTURADA";
+	}
 	//std::cout << "\n\tPIEZA CAPTURADA\n";
 	if (m_turno == Color::B)
 	{
