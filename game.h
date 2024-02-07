@@ -16,7 +16,6 @@ class Game {
 
 		void setTextura(sf::Texture& t, std::string path);
 		void setFuente(sf::Font& f, std::string path);
-		//void setSonido(sf::SoundBuffer& s, std::string path);
 		void CambioDeTurno();
 		std::string getTurno();
 		bool MouseEnTablero(sf::RenderWindow&);
@@ -33,32 +32,32 @@ class Game {
 
 		//	Movimientos
 
-		bool MovimientosRey(Pieza& p, sf::Vector2i posA, sf::Vector2i posB);
-		bool MovimientosDama(Pieza& p, sf::Vector2i posA, sf::Vector2i posB);
-		bool MovimientosTorre(Pieza& p, sf::Vector2i posA, sf::Vector2i posB);
-		bool MovimientosAlfil(Pieza& p, sf::Vector2i posA, sf::Vector2i posB);
-		bool MovimientosCaballo(Pieza& p, sf::Vector2i posA, sf::Vector2i posB);
-		bool MovimientosPeon(Pieza& p, sf::Vector2i posA, sf::Vector2i posB);
+		bool MovimientosRey(Pieza& p, sf::Vector2i posP, sf::Vector2i posA);
+		bool MovimientosDama(Pieza& p, sf::Vector2i posP, sf::Vector2i posA);
+		bool MovimientosTorre(Pieza& p, sf::Vector2i posP, sf::Vector2i posA);
+		bool MovimientosAlfil(Pieza& p, sf::Vector2i posP, sf::Vector2i posA);
+		bool MovimientosCaballo(Pieza& p, sf::Vector2i posP, sf::Vector2i posA);
+		bool MovimientosPeon(Pieza& p, sf::Vector2i posP, sf::Vector2i posA);
 
 		bool MovimientoPosible(int k, sf::Vector2i posk);
 		bool MovimientosDisponibles(Pieza& R);
 
 		//	Jugadas
 
-		bool PiezaClavada(Pieza k, sf::Vector2i posA, sf::Vector2i posB, int R);
+		bool PiezaClavada(Pieza k, sf::Vector2i posP, sf::Vector2i posA, int R);
 		void CapturarPieza(Pieza& k, Pieza& l, sf::Vector2i newpos);
-		bool Enroque(int k, sf::Vector2i posA, sf::Vector2i posB);
-		bool CapturaAlPaso(int k, sf::Vector2i posA, sf::Vector2i posB, sf::Vector2i oldpos);
-		bool Coronacion(int k, sf::Vector2i posA, sf::Vector2i posB);
+		bool Enroque(int k, sf::Vector2i posP, sf::Vector2i posA);
+		bool CapturaAlPaso(int k, sf::Vector2i posP, sf::Vector2i posA, sf::Vector2i oldpos);
+		bool Coronacion(int k, sf::Vector2i posP, sf::Vector2i posA);
 		bool Conversion(sf::Vector2i mouse, sf::Vector2i pos);
 
 		//	JaqueMate
 
-		bool PiezaEnMedio(int sentido, sf::Vector2i posA, sf::Vector2i posl, int k);
+		bool PiezaEnMedio(int sentido, sf::Vector2i posP, sf::Vector2i posl, int k);
 		bool CasillaEnJuego(sf::Vector2i pos, int k);
 		bool Ahogado(sf::Vector2i posR, int Rey);
 		bool Jaque(sf::Vector2i pos, int k);
-		bool CubrirRey(int piezajaque, int piece, sf::Vector2i posA, sf::Vector2i posB);
+		bool CubrirRey(int piezajaque, int piece, sf::Vector2i posP, sf::Vector2i posA);
 		bool SalvarRey(int R, int Atk);
 
 		//	Game

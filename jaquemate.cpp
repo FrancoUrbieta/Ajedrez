@@ -2,17 +2,17 @@
 #include <iostream>
 #include "game.h"
 
-bool Game::PiezaEnMedio(int sentido, sf::Vector2i posA, sf::Vector2i posl, int k)
+bool Game::PiezaEnMedio(int sentido, sf::Vector2i posP, sf::Vector2i posl, int k)
 {
 	if (sentido == 1)		//horizontal
 	{
-		int inicio = posA.x, fin = posl.x;
+		int inicio = posP.x, fin = posl.x;
 
-		if (inicio > fin) { inicio = posl.x, fin = posA.x; }
+		if (inicio > fin) { inicio = posl.x, fin = posP.x; }
 
 		for (int l = inicio + 1; l < fin; l++)
 		{
-			if (Tablero(l, posA.y).m_ocp && Tablero(l, posA.y).m_pieza != P(k).m_nro)
+			if (Tablero(l, posP.y).m_ocp && Tablero(l, posP.y).m_pieza != P(k).m_nro)
 			{
 				return true;
 			}
@@ -20,13 +20,13 @@ bool Game::PiezaEnMedio(int sentido, sf::Vector2i posA, sf::Vector2i posl, int k
 	}
 	else if (sentido == 2)		//vertical
 	{
-		int inicio = posA.y, fin = posl.y;
+		int inicio = posP.y, fin = posl.y;
 
-		if (inicio > fin) { inicio = posl.y, fin = posA.y; }
+		if (inicio > fin) { inicio = posl.y, fin = posP.y; }
 
 		for (int l = inicio + 1; l < fin; l++)
 		{
-			if (Tablero(posA.x, l).m_ocp && Tablero(posA.x, l).m_pieza != P(k).m_nro)
+			if (Tablero(posP.x, l).m_ocp && Tablero(posP.x, l).m_pieza != P(k).m_nro)
 			{
 				return true;
 			}
@@ -34,49 +34,49 @@ bool Game::PiezaEnMedio(int sentido, sf::Vector2i posA, sf::Vector2i posl, int k
 	}
 	else if (sentido == 3)		//diagonal
 	{
-		int inicio = posA.x, fin = posl.x;
+		int inicio = posP.x, fin = posl.x;
 
-		if (inicio > fin) { inicio = posl.x, fin = posA.x; }
+		if (inicio > fin) { inicio = posl.x, fin = posP.x; }
 
 		int medio = fin - inicio;
 
 		for (int l = 1; l < medio; l++)
 		{
-			if (posA.x > posl.x && posA.y > posl.y)
+			if (posP.x > posl.x && posP.y > posl.y)
 			{
-				if (Tablero(posA.x - l, posA.y - l).m_ocp && (posA.x - l >= 0 && posA.y - l >= 0))
+				if (Tablero(posP.x - l, posP.y - l).m_ocp && (posP.x - l >= 0 && posP.y - l >= 0))
 				{
-					if (Tablero(posA.x - l, posA.y - l).m_pieza != P(k).m_nro)
+					if (Tablero(posP.x - l, posP.y - l).m_pieza != P(k).m_nro)
 					{
 						return true;
 					}
 				}
 			}
-			if (posA.x < posl.x && posA.y > posl.y)
+			if (posP.x < posl.x && posP.y > posl.y)
 			{
-				if (Tablero(posA.x + l, posA.y - l).m_ocp && (posA.x + l <= 7 && posA.y - l >= 0))
+				if (Tablero(posP.x + l, posP.y - l).m_ocp && (posP.x + l <= 7 && posP.y - l >= 0))
 				{
-					if (Tablero(posA.x + l, posA.y - l).m_pieza != P(k).m_nro)
+					if (Tablero(posP.x + l, posP.y - l).m_pieza != P(k).m_nro)
 					{
 						return true;
 					}
 				}
 			}
-			if (posA.x > posl.x && posA.y < posl.y)
+			if (posP.x > posl.x && posP.y < posl.y)
 			{
-				if (Tablero(posA.x - l, posA.y + l).m_ocp && (posA.x - l >= 0 && posA.y + l <= 7))
+				if (Tablero(posP.x - l, posP.y + l).m_ocp && (posP.x - l >= 0 && posP.y + l <= 7))
 				{
-					if (Tablero(posA.x - l, posA.y + l).m_pieza != P(k).m_nro)
+					if (Tablero(posP.x - l, posP.y + l).m_pieza != P(k).m_nro)
 					{
 						return true;
 					}
 				}
 			}
-			if (posA.x < posl.x && posA.y < posl.y)
+			if (posP.x < posl.x && posP.y < posl.y)
 			{
-				if (Tablero(posA.x + l, posA.y + l).m_ocp && (posA.x + l <= 7 && posA.y + l <= 7))
+				if (Tablero(posP.x + l, posP.y + l).m_ocp && (posP.x + l <= 7 && posP.y + l <= 7))
 				{
-					if (Tablero(posA.x + l, posA.y + l).m_pieza != P(k).m_nro)
+					if (Tablero(posP.x + l, posP.y + l).m_pieza != P(k).m_nro)
 					{
 						return true;
 					}
@@ -688,40 +688,40 @@ bool Game::Jaque(sf::Vector2i pos, int k)
 	return false;
 }
 
-bool Game::CubrirRey(int piezajaque, int piece, sf::Vector2i posA, sf::Vector2i posB)
+bool Game::CubrirRey(int piezajaque, int piece, sf::Vector2i posP, sf::Vector2i posA)
 {
 	int Rey = getReyRival(piezajaque);
-	if (posA == P(piezajaque).m_pos)
+	if (posP == P(piezajaque).m_pos)
 	{
-		Tablero(posB.x, posB.y).VaciarCasilla();
+		Tablero(posA.x, posA.y).VaciarCasilla();
 		Tablero(P(piezajaque).m_pos.x, P(piezajaque).m_pos.y).VaciarCasilla();
 		if (CasillaEnJuego(P(Rey).m_pos, Rey))
 		{
-			P(piece).ColocarPieza(posB.x, posB.y, piece, P(piece).m_tipo, P(piece).m_color);
+			P(piece).ColocarPieza(posA.x, posA.y, piece, P(piece).m_tipo, P(piece).m_color);
 			P(piezajaque).ColocarPieza(P(piezajaque).m_pos.x, P(piezajaque).m_pos.y,
 				piezajaque, P(piezajaque).m_tipo, P(piezajaque).m_color);
 		}
 		else if (!CasillaEnJuego(P(Rey).m_pos, Rey))
 		{
-			P(piece).ColocarPieza(posB.x, posB.y, piece, P(piece).m_tipo, P(piece).m_color);
+			P(piece).ColocarPieza(posA.x, posA.y, piece, P(piece).m_tipo, P(piece).m_color);
 			P(piezajaque).ColocarPieza(P(piezajaque).m_pos.x, P(piezajaque).m_pos.y,
 				piezajaque, P(piezajaque).m_tipo, P(piezajaque).m_color);
 			return true;
 		}
 	}
-	else if (posA != P(piezajaque).m_pos && !Tablero(posA.x, posA.y).m_ocp)
+	else if (posP != P(piezajaque).m_pos && !Tablero(posP.x, posP.y).m_ocp)
 	{
 		int angulo = SentidoDeAtaque(P(Rey), P(piezajaque));
-		P(piece).ColocarPieza(posA.x, posA.y, piece, P(piece).m_tipo, P(piece).m_color);
+		P(piece).ColocarPieza(posP.x, posP.y, piece, P(piece).m_tipo, P(piece).m_color);
 		if (!PiezaEnMedio(angulo, P(Rey).m_pos, P(piezajaque).m_pos, Rey))
 		{
-			Tablero(posA.x, posA.y).VaciarCasilla();
-			P(piece).ColocarPieza(posB.x, posB.y, piece, P(piece).m_tipo, P(piece).m_color);
+			Tablero(posP.x, posP.y).VaciarCasilla();
+			P(piece).ColocarPieza(posA.x, posA.y, piece, P(piece).m_tipo, P(piece).m_color);
 		}
 		else if (PiezaEnMedio(angulo, P(Rey).m_pos, P(piezajaque).m_pos, Rey))
 		{
-			Tablero(posA.x, posA.y).VaciarCasilla();
-			P(piece).ColocarPieza(posB.x, posB.y, piece, P(piece).m_tipo, P(piece).m_color);
+			Tablero(posP.x, posP.y).VaciarCasilla();
+			P(piece).ColocarPieza(posA.x, posA.y, piece, P(piece).m_tipo, P(piece).m_color);
 			return true;
 		}
 	}

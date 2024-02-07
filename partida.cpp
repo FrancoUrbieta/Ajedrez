@@ -51,14 +51,6 @@ void Game::setFuente(sf::Font& f, std::string path) {
 	}
 }
 
-/*void Game::setSonido(sf::SoundBuffer& s, std::string path)
-{
-	s.loadFromFile(path);
-	if (!s.loadFromFile(path))	{
-		std::cout << "\n\tCarga Fallida... - " << path << "\n";
-	}
-}*/
-
 bool Game::PeonCoronado(int k) const
 {
 	for (int c = 0; c < 16; c++)

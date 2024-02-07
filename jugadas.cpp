@@ -2,23 +2,23 @@
 #include <iostream>
 #include "game.h"
 
-bool Game::PiezaClavada(Pieza k, sf::Vector2i posA, sf::Vector2i posB, int R)
+bool Game::PiezaClavada(Pieza k, sf::Vector2i posP, sf::Vector2i posA, int R)
 {
 	Pieza p;
-	Tablero(posB.x, posB.y).VaciarCasilla();
+	Tablero(posA.x, posA.y).VaciarCasilla();
 
-	if (Tablero(posA.x, posA.y).m_ocp) {
-		p = P(Tablero(posA.x, posA.y).m_pieza);
+	if (Tablero(posP.x, posP.y).m_ocp) {
+		p = P(Tablero(posP.x, posP.y).m_pieza);
 	}
 
-	k.ColocarPieza(posA.x, posA.y, k.m_nro, k.m_tipo, k.m_color);
+	k.ColocarPieza(posP.x, posP.y, k.m_nro, k.m_tipo, k.m_color);
 	if (CasillaEnJuego(P(R).m_pos, R))
 	{
-		Tablero(posA.x, posA.y).VaciarCasilla();
-		k.ColocarPieza(posB.x, posB.y, k.m_nro, k.m_tipo, k.m_color);
+		Tablero(posP.x, posP.y).VaciarCasilla();
+		k.ColocarPieza(posA.x, posA.y, k.m_nro, k.m_tipo, k.m_color);
 
 		if (p.m_enjuego) {
-			P(p.m_nro).ColocarPieza(posA.x, posA.y, p.m_nro, p.m_tipo, p.m_color);
+			P(p.m_nro).ColocarPieza(posP.x, posP.y, p.m_nro, p.m_tipo, p.m_color);
 		}
 
 		if (CasillaEnJuego(P(R).m_pos, R))
@@ -28,11 +28,11 @@ bool Game::PiezaClavada(Pieza k, sf::Vector2i posA, sf::Vector2i posB, int R)
 		//std::cout << "\n\tClavado";
 		return true;
 	}
-	Tablero(posA.x, posA.y).VaciarCasilla();
-	k.ColocarPieza(posB.x, posB.y, k.m_nro, k.m_tipo, k.m_color);
+	Tablero(posP.x, posP.y).VaciarCasilla();
+	k.ColocarPieza(posA.x, posA.y, k.m_nro, k.m_tipo, k.m_color);
 
 	if (p.m_enjuego) {
-		P(p.m_nro).ColocarPieza(posA.x, posA.y, p.m_nro, p.m_tipo, p.m_color);
+		P(p.m_nro).ColocarPieza(posP.x, posP.y, p.m_nro, p.m_tipo, p.m_color);
 	}
 
 	return false;
@@ -60,19 +60,19 @@ void Game::CapturarPieza(Pieza& k, Pieza& l, sf::Vector2i newpos)
 	k.ColocarPieza(newpos.x, newpos.y, k.m_nro, k.m_tipo, k.m_color);
 }
 
-bool Game::Enroque(int k, sf::Vector2i posA, sf::Vector2i posB)
+bool Game::Enroque(int k, sf::Vector2i posP, sf::Vector2i posA)
 {
 	if (!P(k).m_move)
 	{
-		if (posB.x == posA.x - 2 && posB.y == posA.y)
+		if (posA.x == posP.x - 2 && posA.y == posP.y)
 		{
-			if (Tablero(7, posA.y).m_ocp)
+			if (Tablero(7, posP.y).m_ocp)
 			{
-				if (P(Tablero(7, posA.y).m_pieza).m_tipo == Tipo::Torre && !P(Tablero(7, posA.y).m_pieza).m_move)
+				if (P(Tablero(7, posP.y).m_pieza).m_tipo == Tipo::Torre && !P(Tablero(7, posP.y).m_pieza).m_move)
 				{
-					sf::Vector2i posl{ 7, posA.y };
+					sf::Vector2i posl{ 7, posP.y };
 
-					if (!PiezaEnMedio(1, posB, posl, k) && !CasillaEnJuego(posA, k))
+					if (!PiezaEnMedio(1, posA, posl, k) && !CasillaEnJuego(posP, k))
 					{
 						m_mensaje = "ENROQUE CORTO";
 						P(Tablero(posl.x, posl.y).m_pieza).ColocarPieza(posl.x - 2, posl.y,
@@ -85,15 +85,15 @@ bool Game::Enroque(int k, sf::Vector2i posA, sf::Vector2i posB)
 				}
 			}
 		}
-		else if (posB.x == posA.x + 2 && posB.y == posA.y)
+		else if (posA.x == posP.x + 2 && posA.y == posP.y)
 		{
-			if (Tablero(0, posA.y).m_ocp)
+			if (Tablero(0, posP.y).m_ocp)
 			{
-				if (P(Tablero(0, posA.y).m_pieza).m_tipo == Tipo::Torre && !P(Tablero(0, posA.y).m_pieza).m_move)
+				if (P(Tablero(0, posP.y).m_pieza).m_tipo == Tipo::Torre && !P(Tablero(0, posP.y).m_pieza).m_move)
 				{
-					sf::Vector2i posl{ 0, posA.y };
+					sf::Vector2i posl{ 0, posP.y };
 
-					if (!PiezaEnMedio(1, posB, posl, k) && !CasillaEnJuego(posA, k))
+					if (!PiezaEnMedio(1, posA, posl, k) && !CasillaEnJuego(posP, k))
 					{
 						m_mensaje = "ENROQUE LARGO";
 						P(Tablero(posl.x, posl.y).m_pieza).ColocarPieza(posl.x + 3, posl.y,
@@ -110,39 +110,39 @@ bool Game::Enroque(int k, sf::Vector2i posA, sf::Vector2i posB)
 	return false;
 }
 
-bool Game::CapturaAlPaso(int k, sf::Vector2i posA, sf::Vector2i posB, sf::Vector2i oldpos)
+bool Game::CapturaAlPaso(int k, sf::Vector2i posP, sf::Vector2i posA, sf::Vector2i oldpos)
 {
 	if (P(k).m_color == Color::N)
 	{
-		if (posB.y == 4)
+		if (posA.y == 4)
 		{
-			if (Tablero(posB.x + 1, posB.y).m_ocp)
+			if (Tablero(posA.x + 1, posA.y).m_ocp)
 			{
-				if (P(Tablero(posB.x + 1, posB.y).m_pieza).m_oldpos == oldpos &&
-					P(Tablero(posB.x + 1, posB.y).m_pieza).m_oldpos.y == posB.y + 2)
+				if (P(Tablero(posA.x + 1, posA.y).m_pieza).m_oldpos == oldpos &&
+					P(Tablero(posA.x + 1, posA.y).m_pieza).m_oldpos.y == posA.y + 2)
 				{
-					if (P(Tablero(posB.x + 1, posB.y).m_pieza).m_color != P(k).m_color &&
-						P(Tablero(posB.x + 1, posB.y).m_pieza).m_tipo == Tipo::Peon)
+					if (P(Tablero(posA.x + 1, posA.y).m_pieza).m_color != P(k).m_color &&
+						P(Tablero(posA.x + 1, posA.y).m_pieza).m_tipo == Tipo::Peon)
 					{
-						if (posA.x == posB.x + 1 && posA.y == posB.y + 1)
+						if (posP.x == posA.x + 1 && posP.y == posA.y + 1)
 						{
-							CapturarPieza(P(k), P(Tablero(posB.x + 1, posB.y).m_pieza), posA);
+							CapturarPieza(P(k), P(Tablero(posA.x + 1, posA.y).m_pieza), posP);
 							return true;
 						}
 					}
 				}
 			}
-			if (Tablero(posB.x - 1, posB.y).m_ocp)
+			if (Tablero(posA.x - 1, posA.y).m_ocp)
 			{
-				if (P(Tablero(posB.x - 1, posB.y).m_pieza).m_oldpos == oldpos &&
-					P(Tablero(posB.x - 1, posB.y).m_pieza).m_oldpos.y == posB.y + 2)
+				if (P(Tablero(posA.x - 1, posA.y).m_pieza).m_oldpos == oldpos &&
+					P(Tablero(posA.x - 1, posA.y).m_pieza).m_oldpos.y == posA.y + 2)
 				{
-					if (P(Tablero(posB.x - 1, posB.y).m_pieza).m_color != P(k).m_color &&
-						P(Tablero(posB.x - 1, posB.y).m_pieza).m_tipo == Tipo::Peon)
+					if (P(Tablero(posA.x - 1, posA.y).m_pieza).m_color != P(k).m_color &&
+						P(Tablero(posA.x - 1, posA.y).m_pieza).m_tipo == Tipo::Peon)
 					{
-						if (posA.x == posB.x - 1 && posA.y == posB.y + 1)
+						if (posP.x == posA.x - 1 && posP.y == posA.y + 1)
 						{
-							CapturarPieza(P(k), P(Tablero(posB.x - 1, posB.y).m_pieza), posA);
+							CapturarPieza(P(k), P(Tablero(posA.x - 1, posA.y).m_pieza), posP);
 							return true;
 						}
 					}
@@ -152,35 +152,35 @@ bool Game::CapturaAlPaso(int k, sf::Vector2i posA, sf::Vector2i posB, sf::Vector
 	}
 	else if (P(k).m_color == Color::B)
 	{
-		if (posB.y == 3)
+		if (posA.y == 3)
 		{
-			if (Tablero(posB.x + 1, posB.y).m_ocp)
+			if (Tablero(posA.x + 1, posA.y).m_ocp)
 			{
-				if (P(Tablero(posB.x + 1, posB.y).m_pieza).m_oldpos == oldpos &&
-					P(Tablero(posB.x + 1, posB.y).m_pieza).m_oldpos.y == posB.y - 2)
+				if (P(Tablero(posA.x + 1, posA.y).m_pieza).m_oldpos == oldpos &&
+					P(Tablero(posA.x + 1, posA.y).m_pieza).m_oldpos.y == posA.y - 2)
 				{
-					if (P(Tablero(posB.x + 1, posB.y).m_pieza).m_color != P(k).m_color &&
-						P(Tablero(posB.x + 1, posB.y).m_pieza).m_tipo == Tipo::Peon)
+					if (P(Tablero(posA.x + 1, posA.y).m_pieza).m_color != P(k).m_color &&
+						P(Tablero(posA.x + 1, posA.y).m_pieza).m_tipo == Tipo::Peon)
 					{
-						if (posA.x == posB.x + 1 && posA.y == posB.y - 1)
+						if (posP.x == posA.x + 1 && posP.y == posA.y - 1)
 						{
-							CapturarPieza(P(k), P(Tablero(posB.x + 1, posB.y).m_pieza), posA);
+							CapturarPieza(P(k), P(Tablero(posA.x + 1, posA.y).m_pieza), posP);
 							return true;
 						}
 					}
 				}
 			}
-			if (Tablero(posB.x - 1, posB.y).m_ocp)
+			if (Tablero(posA.x - 1, posA.y).m_ocp)
 			{
-				if (P(Tablero(posB.x - 1, posB.y).m_pieza).m_oldpos == oldpos && 
-					P(Tablero(posB.x - 1, posB.y).m_pieza).m_oldpos.y == posB.y - 2)
+				if (P(Tablero(posA.x - 1, posA.y).m_pieza).m_oldpos == oldpos && 
+					P(Tablero(posA.x - 1, posA.y).m_pieza).m_oldpos.y == posA.y - 2)
 				{
-					if (P(Tablero(posB.x - 1, posB.y).m_pieza).m_color != P(k).m_color &&
-						P(Tablero(posB.x - 1, posB.y).m_pieza).m_tipo == Tipo::Peon)
+					if (P(Tablero(posA.x - 1, posA.y).m_pieza).m_color != P(k).m_color &&
+						P(Tablero(posA.x - 1, posA.y).m_pieza).m_tipo == Tipo::Peon)
 					{
-						if (posA.x == posB.x - 1 && posA.y == posB.y - 1)
+						if (posP.x == posA.x - 1 && posP.y == posA.y - 1)
 						{
-							CapturarPieza(P(k), P(Tablero(posB.x - 1, posB.y).m_pieza), posA);
+							CapturarPieza(P(k), P(Tablero(posA.x - 1, posA.y).m_pieza), posP);
 							return true;
 						}
 					}
@@ -191,20 +191,20 @@ bool Game::CapturaAlPaso(int k, sf::Vector2i posA, sf::Vector2i posB, sf::Vector
 	return false;
 }
 
-bool Game::Coronacion(int k, sf::Vector2i posA, sf::Vector2i posB)
+bool Game::Coronacion(int k, sf::Vector2i posP, sf::Vector2i posA)
 {
-	if (posA != posB)
+	if (posP != posA)
 	{
 		if (P(k).m_color == Color::N)
 		{
-			if (posA.y == 7)
+			if (posP.y == 7)
 			{
 				return true;
 			}
 		}
 		else if (P(k).m_color == Color::B)
 		{
-			if (posA.y == 0)
+			if (posP.y == 0)
 			{
 				return true;
 			}

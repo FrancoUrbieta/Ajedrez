@@ -92,12 +92,6 @@ void Game::Menu()
 
 void Game::ProcessEvents()
 {
-	/*sf::SoundBuffer B_inicio;
-	setSonido(B_inicio, "JuegoIniciado.wav")
-
-	sf::Sound S_inicio;
-	S_inicio.play();*/
-
 	sf::Event event;
 
 	while (ajedrez.pollEvent(event))
@@ -155,11 +149,6 @@ void Game::ProcessEvents()
 									m_piece = Tablero(i, j).m_pieza;
 									m_mensaje = "Entrada en " + P(m_piece).getTipo() + " " + P(m_piece).getColor();
 
-									/*PiezaEnCasilla(P(Tablero(i, j).m_pieza));
-									CoordenadasMouse(ajedrez);
-									CoordenadasPieza(Tablero(i, j).m_pieza);
-									CoordenadasCasilla(i, j);*/
-
 									m_oldpos.x = i;		m_oldpos.y = j;
 									m_oldcoord.x = Tablero(m_oldpos.x, m_oldpos.y).m_casilla.getGlobalBounds().getPosition().x;
 									m_oldcoord.y = Tablero(m_oldpos.x, m_oldpos.y).m_casilla.getGlobalBounds().getPosition().y;
@@ -172,7 +161,6 @@ void Game::ProcessEvents()
 								{
 									m_piece = Tablero(i, j).m_pieza;
 									m_mensaje = "Pieza Equivocada - Turno del Equipo " + getTurno() + "...";
-									//std::cout << "\n\tPieza Equivocada - Turno del Equipo " << getTurno() << "...\n";
 									m_move = false;
 								}
 							}
@@ -181,31 +169,25 @@ void Game::ProcessEvents()
 								m_mensaje = "Entrada en Casilla Vacia - [ ";
 								m_mensaje += char(i + 97);
 								m_mensaje += " ][ " + std::to_string(j + 1) + " ]";
-								//std::cout << "\n\Entrada en Casilla Vacia\n";
 								m_oldpos.x = i;		m_oldpos.y = j;
 								m_oldcoord.x = Tablero(m_oldpos.x, m_oldpos.y).m_casilla.getGlobalBounds().getPosition().x;
 								m_oldcoord.y = Tablero(m_oldpos.x, m_oldpos.y).m_casilla.getGlobalBounds().getPosition().y;
-								/*CoordenadasMouse(ajedrez);
-								CoordenadasCasilla(i, j);*/
 								break;
 							}
 						}
 						if (!MouseEnTablero(ajedrez))
 						{
 							m_mensaje = "Sin entrada - Fuera del Tablero";
-							//std::cout << "\n\tSin entrada - Fuera del Tablero\n";
 							break;
 						}
 					}
 					if (Abandonar(mouse, m_abandonarR))
 					{
 						m_mensaje = "ABANDONO - El equipo " + getTurno() + " se ha retirado, ";
-						//std::cout << "\n\n\t\tABANDONO - El equipo " << getTurno() << " se ha retirado, ";
 
 						CambioDeTurno();
 
 						m_mensaje += "gana \nel equipo " + getTurno() + "!";
-						//std::cout << "gana el equipo " << getTurno() << "!\n\n";
 						m_gameover = true;
 					}
 					if (Tablas(mouse, m_tablasR))
@@ -239,9 +221,17 @@ void Game::ProcessEvents()
 									break;
 								}
 							}
+
 							P(Tablero(m_newpos.x, m_newpos.y).m_pieza).ConvertirPieza(P(k).m_tipo);
 							m_mensaje = "CONVERSION EXITOSA - El Peon se convirtio \n";
 							m_mensaje += "en " + P(k).getTipo() + "!";
+
+							if (CasillaEnJuego(P(P(k).getReyNum(P(k).m_color)).m_pos, P(k).getReyNum(P(k).m_color)))
+							{
+								m_mensaje += " JAQUE realizado en consecuencia.";
+								m_jaque = true;
+							}
+
 							m_Njugada = P(k).getTipo()[0];
 							m_coronacion = false;
 							m_move = false;
@@ -270,7 +260,8 @@ void Game::ProcessEvents()
 					{
 						if (P(m_piece).m_tipo != Tipo::Rey)
 						{
-							if (CubrirRey(m_piezajaque, m_piece, m_newpos, m_oldpos))
+							if (CubrirRey(m_piezajaque, m_piece, m_newpos, m_oldpos) &&
+								MovimientoPosible(m_piece, m_newpos))
 							{
 								m_jaque = false;
 							}
@@ -364,13 +355,10 @@ void Game::ProcessEvents()
 								if (!m_jugada)
 								{
 									m_mensaje = "NUEVA UBICACION";
-									//std::cout << "\n\tNUEVA UBICACION\n";
 								}
 
 								if (m_piece > -1) { P(m_piece).m_move = true; }
-								/*CoordenadasPieza(m_piece);
-								CoordenadasCasilla(m_newpos.x, m_newpos.y);*/
-
+								
 								m_newcoord.x = Tablero(m_newpos.x, m_newpos.y).m_casilla.getGlobalBounds().getPosition().x;
 								m_newcoord.y = Tablero(m_newpos.x, m_newpos.y).m_casilla.getGlobalBounds().getPosition().y;
 
@@ -399,7 +387,6 @@ void Game::ProcessEvents()
 							{
 								P(m_piece).m_sprite.setPosition(m_oldcoord.x, m_oldcoord.y);
 								m_mensaje = "Movimiento Incorrecto - Vuelva a intentar...";
-								//std::cout << "\n\tMovimiento Incorrecto - Vuelva a intentar...\n";
 								m_move = false;		break;
 							}
 						}
@@ -424,12 +411,10 @@ void Game::ProcessEvents()
 					{
 						P(m_piece).m_sprite.setPosition(m_oldcoord.x, m_oldcoord.y);
 						m_mensaje = "Movimiento Incorrecto - Vuelva a intentar...";
-						//std::cout << "\n\tMovimiento Incorrecto - Vuelva a intentar...\n";
 					}
 					
 					if (m_jaque || CasillaEnJuego(P(getReyRival(m_piece)).m_pos, getReyRival(m_piece)))
 					{
-						//std::cout << "\n\tJAQUE\n";	
 						m_mensaje = "JAQUE - Mueva, cubra o salve al Rey...";
 						m_jaque = true;
 					}
@@ -439,7 +424,6 @@ void Game::ProcessEvents()
 						!SalvarRey(getReyRival(m_piece), m_piezajaque))
 					{
 						m_mensaje = "JAQUE MATE - Gana el equipo " + P(m_piece).getColor() + "!\n";
-						//std::cout << "\n\n\t\tJAQUE MATE - Gana el equipo " << P(m_piece).getColor() << "!\n\n";
 						m_gameover = true;
 					}
 					else if (!MovimientosDisponibles(P(getReyRival(m_piece))) &&
@@ -447,13 +431,11 @@ void Game::ProcessEvents()
 						!CasillaEnJuego(P(getReyRival(m_piece)).m_pos, getReyRival(m_piece)))
 					{
 						m_mensaje = "TABLAS POR AHOGADO - No hay movimientos \ndisponibles.";
-						//std::cout << "\n\n\t\tTABLAS POR AHOGADO - No hay movimientos disponibles.\n\n";
 						m_gameover = true;
 					}
 					else if (m_piezasblancas == 1 && m_piezasnegras == 1)
 					{
 						m_mensaje = "TABLAS POR MATERIAL INSUFICIENTE - Un Rey no puede \ndar JaqueMate a otro Rey.";
-						//std::cout << "\n\n\t\tTABLAS POR MATERIAL INSUFICIENTE - Un Rey no puede dar JaqueMate a otro.\n\n";
 						m_gameover = true;
 					}
 					m_piece = -1;
